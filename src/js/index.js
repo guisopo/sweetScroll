@@ -1,2 +1,15 @@
 import "../styles/main.scss";
-console.log('Hello you!');
+
+class SweetScroll {
+  constructor() {
+
+  }
+
+  init() {
+    console.log('hola');
+  }
+}
+
+const runSweetScroll = new SweetScroll().init();
+
+// runSweetScroll;
