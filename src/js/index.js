@@ -31,6 +31,7 @@ class SweetScroll {
 
   setInitialStyles() {
     document.body.style.overscrollBehavior = 'none';
+    document.body.style.overflow = 'hidden';
   }
 
   setBounds() {
@@ -57,7 +58,7 @@ class SweetScroll {
   }
 
   run() {
-    if(this.scroll.delta !== 0) {
+    if(Math.abs(this.scroll.delta) > 0) {
       this.scroll.current = this.scroll.current + this.scroll.delta;
       this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.maxScroll);
       this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
