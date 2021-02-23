@@ -1,7 +1,10 @@
+body {
+  position: relative;
+}
+
 .slider {
   --slidesTotal: 7;
-
-  position: fixed;
+  position: sticky;
   display: flex;
   align-items: center;
   width: 100%;

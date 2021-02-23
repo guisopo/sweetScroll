@@ -16,15 +16,21 @@ class SweetScroll {
     this.slider = document.querySelector('.slider__container');
     this.maxScroll;
     this.isScrolling = false;
-    this.data = {
+    this.scroll = {
       delta: 0,
-      current: 0
+      current: 0,
+      last: 0,
+      ease: 0.1
     };
   }
 
   bindAll() {
     [ 'setBounds', 'addEvents', 'wheel', 'run']
       .forEach( fn => this[fn] = this[fn].bind(this));
+  }
+
+  setInitialStyles() {
+    document.body.style.overscrollBehavior = 'none';
   }
 
   setBounds() {
@@ -42,7 +48,7 @@ class SweetScroll {
   }
 
   wheel(e) {
-    this.data.delta = e.deltaY || e.deltaX;
+    this.scroll.delta = e.deltaY || e.deltaX;
   }
 
   addEvents() {
@@ -51,17 +57,19 @@ class SweetScroll {
   }
 
   run() {
-    if(this.data.delta !== 0) {
-      this.data.current = MathUtils.clamp(this.data.current, 0, this.maxScroll);
-      this.data.current = this.data.current + this.data.delta;
-      this.data.delta = 0;
-      this.slider.style.transform = `translate3d(-${this.data.current}px, 0, 0)`;
+    if(this.scroll.delta !== 0) {
+      this.scroll.current = this.scroll.current + this.scroll.delta;
+      this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.maxScroll);
+      this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
+      this.scroll.delta = 0;
+      this.slider.style.transform = `translate3d(-${this.scroll.last}px, 0, 0)`;
     }
 
     requestAnimationFrame(() => this.run());
   }
 
   init() {
+    this.setInitialStyles();
     this.bindAll();
     this.setBounds();
     this.addEvents();
