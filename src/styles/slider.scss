@@ -13,6 +13,8 @@
     grid-template-columns: repeat(var(--slidesTotal),var(--col-4));
     column-gap: 4.167vw;
     padding: 0 4.167vw;
+
+    will-change: transform;
   }
 
   &__item {
