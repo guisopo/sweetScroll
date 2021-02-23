@@ -14,18 +14,19 @@ const MathUtils = {
 class SweetScroll {
   constructor() {
     this.slider = document.querySelector('.slider__container');
-    this.maxScroll;
     this.isScrolling = false;
     this.scroll = {
       delta: 0,
       current: 0,
       last: 0,
-      ease: 0.1
+      ease: 0.1,
+      speed: 0,
+      direction: null
     };
   }
 
   bindAll() {
-    [ 'setBounds', 'addEvents', 'wheel', 'run']
+    [ 'setBounds', 'addEvents', 'onWheel', 'run']
       .forEach( fn => this[fn] = this[fn].bind(this));
   }
 
@@ -45,28 +46,37 @@ class SweetScroll {
       height: this.slider.offsetHeight
     }
 
-    this.maxScroll = this.sliderShize.width - this.windowSize.width;
+    this.limitScroll = this.sliderShize.width - this.windowSize.width;
   }
 
-  wheel(e) {
+  onWheel(e) {
     this.scroll.delta = e.deltaY || e.deltaX;
+    this.addDirection();
   }
 
-  addEvents() {
-    this.slider.addEventListener('wheel', () => addEventListener('wheel', this.wheel, { passive: true }));
-    window.addEventListener('resize', this.setBounds);
+  addDirection() {
+    this.scroll.delta > 0 ? this.scroll.direction = 'right' : this.scroll.direction = 'left';
   }
 
   run() {
-    if(Math.abs(this.scroll.delta) > 0) {
-      this.scroll.current = this.scroll.current + this.scroll.delta;
-      this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.maxScroll);
+    // if(Math.abs(this.scroll.delta) > 0.001) {
+      
+      this.scroll.current += this.scroll.delta;
+      this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
       this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
+      
       this.scroll.delta = 0;
-      this.slider.style.transform = `translate3d(-${this.scroll.last}px, 0, 0)`;
-    }
 
+      this.scroll.speed = Math.abs(this.scroll.current - this.scroll.last);
+      
+      this.slider.style.transform = `translate3d(-${this.scroll.last}px, 0, 0)`;
+    // }
     requestAnimationFrame(() => this.run());
+  }
+
+  addEvents() {
+    this.slider.addEventListener('wheel', this.onWheel, { passive: true });
+    window.addEventListener('resize', this.setBounds);
   }
 
   init() {
