@@ -6,20 +6,20 @@ const MathUtils = {
   // linear interpolation
   lerp: (a, b, n) => (1 - n) * a + n * b,
   // normalization
-  norm: (value, min, max) => {
-    return (value - min) / (max - min)
-  }
+  norm: (value, min, max) => (value - min) / (max - min),
+  // clamp
+  clamp: (x, min, max) =>  Math.min(Math.max(x, min), max)
 };
 
 class SweetScroll {
   constructor() {
     this.slider = document.querySelector('.slider__container');
-
-    this.delta = 0;
-
+    this.maxScroll;
+    this.isScrolling = false;
     this.data = {
+      delta: 0,
       current: 0
-    }
+    };
   }
 
   bindAll() {
@@ -32,10 +32,17 @@ class SweetScroll {
       width: window.innerWidth,
       height: window.innerHeight
     };
+
+    this.sliderShize = {
+      width: this.slider.offsetWidth,
+      height: this.slider.offsetHeight
+    }
+
+    this.maxScroll = this.sliderShize.width - this.windowSize.width;
   }
 
   wheel(e) {
-    this.delta = e.deltaY || e.deltaX;
+    this.data.delta = e.deltaY || e.deltaX;
   }
 
   addEvents() {
@@ -44,9 +51,12 @@ class SweetScroll {
   }
 
   run() {
-    this.data.current = this.data.current + this.delta;
-    this.delta = 0;
-    this.slider.style.transform = `translate3d(-${this.data.current}px, 0, 0)`;
+    if(this.data.delta !== 0) {
+      this.data.current = MathUtils.clamp(this.data.current, 0, this.maxScroll);
+      this.data.current = this.data.current + this.data.delta;
+      this.data.delta = 0;
+      this.slider.style.transform = `translate3d(-${this.data.current}px, 0, 0)`;
+    }
 
     requestAnimationFrame(() => this.run());
   }
