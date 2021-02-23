@@ -1,1 +1,6 @@
 @import '~normalize.css';
+// config
+@import './variables.scss';
+@import './aspect-ratio.scss';
+// components
+@import './slider.scss';

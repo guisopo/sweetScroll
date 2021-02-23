@@ -1,0 +1,45 @@
+
+.slider {
+  --slidesTotal: 7;
+
+  position: fixed;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100vh;
+
+  &__container {
+    display: grid;
+    align-items: center;
+    grid-template-columns: repeat(var(--slidesTotal),var(--col-4));
+    column-gap: 4.167vw;
+    padding: 0 4.167vw;
+  }
+
+  &__item {
+    --aspect-ratio: 0.8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+
+    &-img__wrap {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+  }
+
+  img {
+    display: block;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
