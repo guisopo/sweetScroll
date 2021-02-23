@@ -1,18 +1,32 @@
+// Aspect ratio hack for images
+// See explanation in https://css-tricks.com/aspect-ratio-boxes/
+
 [style*="--aspect-ratio"] > :first-child {
+  // Stretch the inner box regardless of support for custom property
   width: 100%;
 }
+
 [style*="--aspect-ratio"] > img {  
+  // Make sure the height of images comes from their intrinsic 
+  // ratio rather than their height attribute
   height: auto;
-} 
+}
+
 @supports (--custom:property) {
   [style*="--aspect-ratio"] {
+    // Style the container as a containing block (so the inner 
+    // box references that ancestor for its positioning)
     position: relative;
   }
+  // Create a pseudo-element to be used with the “padding hack” 
+  // (it is that element that creates the aspect ratio)
   [style*="--aspect-ratio"]::before {
     content: "";
     display: block;
     padding-bottom: calc(100% / (var(--aspect-ratio)));
-  }  
+  }
+  // Style the inner box so it matches the dimensions of 
+  // its containing block
   [style*="--aspect-ratio"] > :first-child {
     position: absolute;
     top: 0;
