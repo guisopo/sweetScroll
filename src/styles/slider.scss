@@ -3,8 +3,8 @@ body {
 }
 
 .slider {
-  --slidesTotal: 7;
-  position: sticky;
+  --slidesTotal: 16;
+  position: fixed;
   overflow: hidden;
   display: flex;
   align-items: center;
