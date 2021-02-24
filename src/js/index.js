@@ -1,5 +1,8 @@
 import "../styles/main.scss";
 
+// TO - DO
+// 1. Change aspect ratio to div not to pseudoelement due to performance issues
+
 const MathUtils = {
   // map number x from range [a, b] to [c, d]
   map: (x, a, b, c, d) => (x - a) * (d - c) / (b - a) + c,
@@ -59,19 +62,16 @@ class SweetScroll {
   }
 
   run() {
-    // if(Math.abs(this.scroll.delta) > 0.001) {
-      
-      this.scroll.current += this.scroll.delta;
-      this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
-      this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
-      
-      this.scroll.delta = 0;
+    this.scroll.current += this.scroll.delta;
+    this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
+    this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
 
-      this.scroll.speed = Math.abs(this.scroll.current - this.scroll.last);
-      
-      this.slider.style.transform = `translate3d(-${this.scroll.last}px, 0, 0)`;
-    // }
-    requestAnimationFrame(() => this.run());
+    this.scroll.speed = Math.abs(this.scroll.current - this.scroll.last);
+    
+    this.slider.style.transform = `translate3d(-${this.scroll.last}px, 0, 0)`;
+    this.scroll.delta = 0;
+
+    requestAnimationFrame(this.run);
   }
 
   addEvents() {
