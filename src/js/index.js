@@ -62,25 +62,35 @@ class SweetScroll {
 
   onWheel(e) {
     this.scroll.delta = e.deltaY || e.deltaX;
-    this.addDirection();
+    this.setDirection();
   }
 
-  addDirection() {
+  setDirection() {
     this.scroll.delta > 0 ? this.scroll.direction = 'right' : this.scroll.direction = 'left';
   }
 
-  run() {
+  calculateSliderPosition() {
     this.scroll.current += this.scroll.delta;
     this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
     this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
+  }
 
+  calculateSpeed() {
     this.scroll.speed = (this.scroll.current - this.scroll.last).toFixed(2);
     this.scroll.acc = this.scroll.speed / this.limitScroll;
+  }
 
+  styleSlider() {
     this.transform.translateX = this.scroll.last.toFixed(2);
-    this.transform.skewX = this.scroll.acc * this.options.skewFactor;
     
-    this.slider.style.transform = `translate3d(-${this.transform.translateX}px, 0, 0) skewX(${this.transform.skewX}deg)`;
+    this.slider.style.transform = `translate3d(-${this.transform.translateX}px, 0, 0)`;
+  }
+
+  run() {
+    this.calculateSliderPosition();
+    // this.calculateSpeed();
+    this.styleSlider();
+
     this.scroll.delta = 0;
 
     requestAnimationFrame(this.run);
