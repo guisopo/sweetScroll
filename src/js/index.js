@@ -1,8 +1,5 @@
 import "../styles/main.scss";
 
-// TO - DO
-// 1. Change aspect ratio to div not to pseudoelement due to performance issues
-
 const MathUtils = {
   // map number x from range [a, b] to [c, d]
   map: (x, a, b, c, d) => (x - a) * (d - c) / (b - a) + c,
@@ -18,14 +15,27 @@ class SweetScroll {
   constructor() {
     this.slider = document.querySelector('.slider__container');
     this.isScrolling = false;
+
+    this.options = {
+      skewFactor: 25
+    }
+    
     this.scroll = {
       delta: 0,
       current: 0,
       last: 0,
       ease: 0.1,
       speed: 0,
+      acc: 0,
       direction: null
     };
+
+    this.toStyle = this.slider.style.transform;
+
+    this.transform = {
+      translateX: null,
+      skewX: null
+    }
   }
 
   bindAll() {
@@ -66,9 +76,13 @@ class SweetScroll {
     this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
     this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
 
-    this.scroll.speed = Math.abs(this.scroll.current - this.scroll.last);
+    this.scroll.speed = (this.scroll.current - this.scroll.last).toFixed(2);
+    this.scroll.acc = this.scroll.speed / this.limitScroll;
+
+    this.transform.translateX = this.scroll.last.toFixed(2);
+    this.transform.skewX = this.scroll.acc * this.options.skewFactor;
     
-    this.slider.style.transform = `translate3d(-${this.scroll.last}px, 0, 0)`;
+    this.slider.style.transform = `translate3d(-${this.transform.translateX}px, 0, 0) skewX(${this.transform.skewX}deg)`;
     this.scroll.delta = 0;
 
     requestAnimationFrame(this.run);
