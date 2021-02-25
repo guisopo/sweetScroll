@@ -30,8 +30,6 @@ class SweetScroll {
       direction: null
     };
 
-    this.toStyle = this.slider.style.transform;
-
     this.transform = {
       translateX: null,
       skewX: null
@@ -54,12 +52,12 @@ class SweetScroll {
       height: window.innerHeight
     };
 
-    this.sliderShize = {
+    this.sliderSize = {
       width: this.slider.offsetWidth,
       height: this.slider.offsetHeight
     }
 
-    this.limitScroll = this.sliderShize.width - this.windowSize.width;
+    this.limitScroll = this.sliderSize.width - this.windowSize.width;
   }
 
   onWheel(e) {
