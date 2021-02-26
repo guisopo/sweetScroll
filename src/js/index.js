@@ -1,5 +1,9 @@
 import "../styles/main.scss";
 
+// TO DO
+// 1. Check if with flexbox we increase performance
+// 2. Scroll Ticking: check locomotiv and article
+
 const MathUtils = {
   // map number x from range [a, b] to [c, d]
   map: (x, a, b, c, d) => (x - a) * (d - c) / (b - a) + c,
@@ -13,13 +17,13 @@ const MathUtils = {
 
 class SweetScroll {
   constructor() {
-    this.slider = document.querySelector('.slider__container');
-    this.isScrolling = false;
-
+    this.slider = document.querySelector('[data-scroll]');
+    this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')]
+    this.observer = null;
     this.options = {
       skewFactor: 25
     }
-    
+    this.scrollTicking;
     this.scroll = {
       delta: 0,
       current: 0,
@@ -83,17 +87,43 @@ class SweetScroll {
   styleSlider() {
     this.transform.translateX = this.scroll.last.toFixed(2);
     
-    this.slider.style.transform = `translate3d(-${this.transform.translateX}px, 0, 0)`;
+    // this.slider.style.transform = `translate3d(-${this.transform.translateX}px, 0, 0)`;
+    this.slider.style.transform = `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)`;
   }
 
   run() {
-    this.calculateSliderPosition();
+    // this.calculateSliderPosition();
     // this.calculateSpeed();
-    this.styleSlider();
+    // this.styleSlider();
 
+    this.scroll.current += this.scroll.delta;
+    this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
+    this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
     this.scroll.delta = 0;
+    
+    this.transform.translateX = this.scroll.last;
+    this.slider.style.transform = `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)`;
 
     requestAnimationFrame(this.run);
+  }
+
+  createObserver() {
+    this.observer = new IntersectionObserver(entries => {
+      for (const entry of entries) { 
+        const id = Number(entry.target.id);
+        console.log(`${entry.target.id} is in view: ${entry.isIntersecting}`);
+        console.log(`${entries[id + 1]} is ${entries[id + 1].isIntersecting}`);
+        entry.isIntersecting 
+          ? entry.target.style.visibility = 'visible' 
+          : entry.target.style.display = 'hidden';
+      }
+    });
+
+    this.observeSliderItems();
+  }
+
+  observeSliderItems() {
+    this.sliderItems.forEach(item => this.observer.observe(item))
   }
 
   addEvents() {
@@ -106,6 +136,7 @@ class SweetScroll {
     this.bindAll();
     this.setBounds();
     this.addEvents();
+    // this.createObserver();
     this.run();
   }
 }
