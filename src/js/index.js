@@ -3,6 +3,7 @@ import "../styles/main.scss";
 // TO DO
 // 1. Check if with flexbox we increase performance
 // 2. Scroll Ticking: check locomotiv and article
+// 3. Recalculate style: check if with fixed width and height better performance
 
 const MathUtils = {
   // map number x from range [a, b] to [c, d]
@@ -23,7 +24,11 @@ class SweetScroll {
     this.options = {
       skewFactor: 25
     }
-    this.scrollTicking;
+
+    this.isScrolling = false;
+    this.scrollTicking = false;
+    this.startScrollTS = null;
+
     this.scroll = {
       delta: 0,
       current: 0,
@@ -77,6 +82,8 @@ class SweetScroll {
     this.scroll.current += this.scroll.delta;
     this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
     this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
+
+    this.styleSlider();
   }
 
   calculateSpeed() {
@@ -86,25 +93,20 @@ class SweetScroll {
 
   styleSlider() {
     this.transform.translateX = this.scroll.last.toFixed(2);
-    
-    // this.slider.style.transform = `translate3d(-${this.transform.translateX}px, 0, 0)`;
     this.slider.style.transform = `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)`;
   }
 
   run() {
-    // this.calculateSliderPosition();
-    // this.calculateSpeed();
-    // this.styleSlider();
+    if(!this.scrollTicking) {
+      this.sweetScrollRaf = requestAnimationFrame(() => this.run());
+      this.scrollTicking = true;
+    }
 
-    this.scroll.current += this.scroll.delta;
-    this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
-    this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
+    this.calculateSliderPosition();
+    
     this.scroll.delta = 0;
     
-    this.transform.translateX = this.scroll.last;
-    this.slider.style.transform = `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)`;
-
-    requestAnimationFrame(this.run);
+    this.scrollTicking = false;
   }
 
   createObserver() {
