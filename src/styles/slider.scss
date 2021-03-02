@@ -8,7 +8,7 @@ html, body {
   position: relative;
 }
 
-.slider {
+.js-slider {
   --slidesTotal: 20;
   --slider-height: 50vh;
 
@@ -20,7 +20,7 @@ html, body {
   height: var(--slider-height);
   padding-top: 23vh;
 
-  &__container {
+  .slider__container {
     display: grid;
     align-items: center;
     grid-template-columns: repeat((var(--slidesTotal)), 1fr);
