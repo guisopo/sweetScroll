@@ -1,9 +1,11 @@
 import "../styles/main.scss";
+import * as dat from 'dat.gui';
 
 // TO DO
-// 1. Check if with flexbox we increase performance
-// 2. Scroll Ticking: check locomotiv and article
-// 3. Recalculate style: check if with fixed width and height better performance
+// 1. Drag and drop
+// 2. Scroll Loop
+// 3. imagesLoader
+// 4. add scroll bar
 
 const MathUtils = {
   // map number x from range [a, b] to [c, d]
@@ -20,14 +22,16 @@ class SweetScroll {
   constructor() {
     this.slider = document.querySelector('[data-scroll]');
     this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')]
+
     this.observer = null;
+
     this.options = {
-      skewFactor: 25
+      skewFactor: 0,
+      scaleFactorX: 0,
+      scaleFactorY: 0
     }
 
-    this.isScrolling = false;
     this.scrollTicking = false;
-    this.startScrollTS = null;
 
     this.scroll = {
       delta: 0,
@@ -41,7 +45,9 @@ class SweetScroll {
 
     this.transform = {
       translateX: null,
-      skewX: null
+      skewX: null,
+      scaleX: null,
+      scaleY: null
     }
   }
 
@@ -82,8 +88,6 @@ class SweetScroll {
     this.scroll.current += this.scroll.delta;
     this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
     this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
-
-    this.styleSlider();
   }
 
   calculateSpeed() {
@@ -91,9 +95,18 @@ class SweetScroll {
     this.scroll.acc = this.scroll.speed / this.limitScroll;
   }
 
-  styleSlider() {
+  calculateTransform() {
     this.transform.translateX = this.scroll.last.toFixed(2);
-    this.slider.style.transform = `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)`;
+    this.transform.skewX = this.scroll.acc * this.options.skewFactor;
+    this.transform.scaleX = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorX);
+    this.transform.scaleY = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorY);
+  }
+
+  styleSlider() {
+    this.slider.style.transform = `
+      matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1) 
+      skew(${this.transform.skewX}deg, 0)
+      scale(${this.transform.scaleX}, ${this.transform.scaleY})`;
   }
 
   run() {
@@ -101,8 +114,10 @@ class SweetScroll {
       this.sweetScrollRaf = requestAnimationFrame(() => this.run());
       this.scrollTicking = true;
     }
-
     this.calculateSliderPosition();
+    this.calculateSpeed();
+    this.calculateTransform();
+    this.styleSlider();
     
     this.scroll.delta = 0;
     
@@ -133,9 +148,45 @@ class SweetScroll {
     window.addEventListener('resize', this.setBounds);
   }
 
+  addDebuger() {
+    const gui = new dat.GUI(({ width: 400 }));
+
+    gui.hide();
+
+    gui
+      .add(this.options, 'scaleFactorX')
+      .min(0)
+      .max(3)
+      .step(0.1)
+      .name('scaleX')
+      .onChange((value) => {
+        this.options.scaleFactorX = value;
+        console.log(this.options.scaleFactorX);
+      });
+    gui
+      .add(this.options, 'scaleFactorY')
+      .min(0)
+      .max(3)
+      .step(0.1)
+      .name('scaleY')
+      .onChange((value) => {
+        this.options.scaleFactorY = value;
+      });
+    gui
+      .add(this.options, 'skewFactor')
+      .min(0)
+      .max(70)
+      .step(1)
+      .name('skewX')
+      .onChange((value) => {
+        this.options.skewFactor = value;
+      });
+  }
+
   init() {
     this.setInitialStyles();
     this.bindAll();
+    this.addDebuger();
     this.setBounds();
     this.addEvents();
     // this.createObserver();
