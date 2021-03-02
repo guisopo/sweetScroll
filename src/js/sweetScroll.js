@@ -23,12 +23,15 @@ export default class SweetScroll {
     this.observer = null;
 
     this.scrollTicking = false;
+    this.isScrolling = false;
+    this.isDragging = false;
 
     this.dragPoint = {
       initialX: null,
       initialY: null,
       lastX: null,
-      lastY: null
+      lastY: null,
+      delta: 0
     }
 
     this.scroll = {
@@ -77,6 +80,10 @@ export default class SweetScroll {
     this.setDirection();
   }
 
+  onDrag() {
+    this.scroll.current = this.dragPoint.lastX - (this.dragPoint.delta * this.options.dragFactor);
+  }
+
   setDirection() {
     this.scroll.delta > 0 ? this.scroll.direction = 'right' : this.scroll.direction = 'left';
   }
@@ -84,6 +91,7 @@ export default class SweetScroll {
   calculateSliderPosition() {
     this.scroll.current += this.scroll.delta;
     this.scroll.delta = 0;
+
     this.scroll.current = clamp(this.scroll.current, 0, this.limitScroll);
     this.scroll.last = lerp(this.scroll.last, this.scroll.current, this.options.ease);
   }
@@ -112,6 +120,7 @@ export default class SweetScroll {
       requestAnimationFrame(() => this.run());
       this.scrollTicking = true;
     }
+    
     this.calculateSliderPosition();
     this.calculateSpeed();
     this.calculateTransform();
@@ -140,18 +149,25 @@ export default class SweetScroll {
   }
 
   onPointerDown(e) {
+    this.isDragging = true;
+
     this.dragPoint.initialX = e.clientX;
+    this.dragPoint.initialY = e.clientY;
     this.dragPoint.lastX = this.scroll.current;
+
     this.slider.removeEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
     this.slider.addEventListener('pointerup', this.onPointerUp, { passive: true });
   }
 
   onPointerMove(e) {
-    this.scroll.current = this.dragPoint.lastX - ((e.clientX - this.dragPoint.initialX) * this.options.dragFactor);
+    this.dragPoint.delta = (e.clientX - this.dragPoint.initialX) + (e.clientY - this.dragPoint.initialY);
+    this.onDrag();
   }
 
   onPointerUp(e) {
+    this.isDragging = false;
+    
     this.dragPoint.lastX = this.scroll.current;
 
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
