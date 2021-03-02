@@ -86,6 +86,7 @@ class SweetScroll {
 
   calculateSliderPosition() {
     this.scroll.current += this.scroll.delta;
+    this.scroll.delta = 0;
     this.scroll.current = MathUtils.clamp(this.scroll.current, 0, this.limitScroll);
     this.scroll.last = MathUtils.lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
   }
@@ -118,8 +119,6 @@ class SweetScroll {
     this.calculateSpeed();
     this.calculateTransform();
     this.styleSlider();
-    
-    this.scroll.delta = 0;
     
     this.scrollTicking = false;
   }
