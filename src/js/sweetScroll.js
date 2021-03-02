@@ -140,31 +140,16 @@ export default class SweetScroll {
 
     gui.hide();
 
-    gui
-      .add(this.options, 'scaleFactorX')
-      .min(0)
-      .max(3)
-      .step(0.1)
-      .name('scaleX')
+    gui.add(this.options, 'scaleFactorX').min(0).max(3).step(0.1).name('scaleX')
       .onChange((value) => {
         this.options.scaleFactorX = value;
         console.log(this.options.scaleFactorX);
       });
-    gui
-      .add(this.options, 'scaleFactorY')
-      .min(0)
-      .max(3)
-      .step(0.1)
-      .name('scaleY')
+    gui.add(this.options, 'scaleFactorY').min(0).max(3).step(0.1).name('scaleY')
       .onChange((value) => {
         this.options.scaleFactorY = value;
       });
-    gui
-      .add(this.options, 'skewFactor')
-      .min(0)
-      .max(70)
-      .step(1)
-      .name('skewX')
+    gui.add(this.options, 'skewFactor').min(0).max(70).step(1).name('skewX')
       .onChange((value) => {
         this.options.skewFactor = value;
       });
