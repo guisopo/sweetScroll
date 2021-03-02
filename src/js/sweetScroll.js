@@ -5,6 +5,7 @@ import { clamp, lerp } from './utils/mathFunctions';
 // 2. Scroll Loop
 // 3. imagesLoader
 // 4. add scroll bar
+// 5. easings
 
 export default class SweetScroll {
   constructor() {
@@ -16,16 +17,24 @@ export default class SweetScroll {
     this.options = {
       skewFactor: 0,
       scaleFactorX: 0,
-      scaleFactorY: 0
+      scaleFactorY: 0,
+      ease: 0.1,
+      dragFactor: 4
     }
 
     this.scrollTicking = false;
+
+    this.dragPoint = {
+      initialX: null,
+      initialY: null,
+      lastX: null,
+      lastY: null
+    }
 
     this.scroll = {
       delta: 0,
       current: 0,
       last: 0,
-      ease: 0.1,
       speed: 0,
       acc: 0,
       direction: null
@@ -40,7 +49,7 @@ export default class SweetScroll {
   }
 
   bindAll() {
-    [ 'setBounds', 'addEvents', 'onWheel', 'run']
+    [ 'setBounds', 'addEvents', 'onWheel', 'onPointerDown', 'onPointerUp', 'onPointerMove', 'run']
       .forEach( fn => this[fn] = this[fn].bind(this));
   }
 
@@ -76,7 +85,7 @@ export default class SweetScroll {
     this.scroll.current += this.scroll.delta;
     this.scroll.delta = 0;
     this.scroll.current = clamp(this.scroll.current, 0, this.limitScroll);
-    this.scroll.last = lerp(this.scroll.last, this.scroll.current, this.scroll.ease);
+    this.scroll.last = lerp(this.scroll.last, this.scroll.current, this.options.ease);
   }
 
   calculateSpeed() {
@@ -100,7 +109,7 @@ export default class SweetScroll {
 
   run() {
     if(!this.scrollTicking) {
-      this.sweetScrollRaf = requestAnimationFrame(() => this.run());
+      requestAnimationFrame(() => this.run());
       this.scrollTicking = true;
     }
     this.calculateSliderPosition();
@@ -130,8 +139,29 @@ export default class SweetScroll {
     this.sliderItems.forEach(item => this.observer.observe(item))
   }
 
+  onPointerDown(e) {
+    this.dragPoint.initialX = e.clientX;
+    this.dragPoint.lastX = this.scroll.current;
+    this.slider.removeEventListener('wheel', this.onWheel, { passive: true });
+    this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
+    this.slider.addEventListener('pointerup', this.onPointerUp, { passive: true });
+  }
+
+  onPointerMove(e) {
+    this.scroll.current = this.dragPoint.lastX - ((e.clientX - this.dragPoint.initialX) * this.options.dragFactor);
+  }
+
+  onPointerUp(e) {
+    this.dragPoint.lastX = this.scroll.current;
+
+    this.slider.addEventListener('wheel', this.onWheel, { passive: true });
+    this.slider.removeEventListener('pointermove', this.onPointerMove, { passive: true });
+    this.slider.removeEventListener('pointerup', this.onPointerUp, { passive: true });
+  }
+
   addEvents() {
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
+    this.slider.addEventListener('pointerdown', this.onPointerDown, { passive: true });
     window.addEventListener('resize', this.setBounds);
   }
 
@@ -140,10 +170,17 @@ export default class SweetScroll {
 
     gui.hide();
 
+    gui.add(this.options, 'ease').min(0).max(0.75).step(0.001).name('Scroll ease')
+      .onChange((value) => {
+        this.options.ease = value;
+      });
+    gui.add(this.options, 'dragFactor').min(1).max(10).step(0.001).name('Drag Factor')
+      .onChange((value) => {
+        this.options.dragFactor = value;
+      });
     gui.add(this.options, 'scaleFactorX').min(0).max(3).step(0.1).name('scaleX')
       .onChange((value) => {
         this.options.scaleFactorX = value;
-        console.log(this.options.scaleFactorX);
       });
     gui.add(this.options, 'scaleFactorY').min(0).max(3).step(0.1).name('scaleY')
       .onChange((value) => {
