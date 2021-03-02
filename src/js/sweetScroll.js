@@ -8,19 +8,19 @@ import { clamp, lerp } from './utils/mathFunctions';
 // 5. easings
 
 export default class SweetScroll {
-  constructor() {
+  constructor(options = {}) {
     this.slider = document.querySelector('[data-scroll]');
     this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')]
 
-    this.observer = null;
-
     this.options = {
-      skewFactor: 0,
-      scaleFactorX: 0,
-      scaleFactorY: 0,
-      ease: 0.1,
-      dragFactor: 4
+      ease: options.ease || 0.1,
+      dragFactor: options.dragFactor || 4,
+      skewFactor: options.skewFactor || 0,
+      scaleFactorX: options.scaleFactorX || 0,
+      scaleFactorY: options.scaleFactorY || 0,
     }
+
+    this.observer = null;
 
     this.scrollTicking = false;
 
