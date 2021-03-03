@@ -153,17 +153,16 @@ export default class SweetScroll {
   onPointerDown(e) {
     this.isDragging = true;
 
-    this.dragPoint.initialX = e.clientX;
-    this.dragPoint.initialY = e.clientY;
+    this.dragPoint.initialX = e.pageX;
+    this.dragPoint.initialY = e.pageY;
     this.dragPoint.lastX = this.scroll.current;
-
     this.slider.removeEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
     this.slider.addEventListener('pointerup', this.onPointerUp, { passive: true });
   }
 
   onPointerMove(e) {
-    this.dragPoint.delta = (e.clientX - this.dragPoint.initialX) + (e.clientY - this.dragPoint.initialY);
+    this.dragPoint.delta = (e.pageX - this.dragPoint.initialX) + (e.pageY - this.dragPoint.initialY);
     this.onDrag();
   }
 
@@ -180,35 +179,38 @@ export default class SweetScroll {
   addEvents() {
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointerdown', this.onPointerDown, { passive: true });
+    // this.slider.addEventListener('touchstart', this.onPointerDown, { passive: true });
+    // this.slider.addEventListener('touchmove', this.onPointerMove, { passive: true });
+    // this.slider.addEventListener('touchend', this.onPointerUp, { passive: true });
     window.addEventListener('resize', this.setBounds);
   }
 
   addDebuger() {
     const gui = new dat.GUI(({ width: 400 }));
 
-    // gui.hide();
+    gui.hide();
 
-    gui.add(this.options, 'ease').min(0.1).max(1).step(0.01).name('Scroll ease')
+    gui.add(this.options, 'ease').min(0.1).max(1).step(0.01).name('Scroll ease:')
       .onChange((value) => {
         this.options.ease = value;
       });
-    gui.add(this.options, 'dragFactor').min(1).max(10).step(0.001).name('Drag Factor')
+    gui.add(this.options, 'dragFactor').min(1).max(10).step(0.001).name('Drag factor:')
       .onChange((value) => {
         this.options.dragFactor = value;
       });
-    gui.add(this.options, 'scaleFactorX').min(0).max(3).step(0.1).name('scaleX')
+    gui.add(this.options, 'scaleFactorX').min(0).max(3).step(0.1).name('Scale X:')
       .onChange((value) => {
         this.options.scaleFactorX = value;
       });
-    gui.add(this.options, 'scaleFactorY').min(0).max(3).step(0.1).name('scaleY')
+    gui.add(this.options, 'scaleFactorY').min(0).max(3).step(0.1).name('Scale Y:')
       .onChange((value) => {
         this.options.scaleFactorY = value;
       });
-    gui.add(this.options, 'skewFactor').min(0).max(70).step(1).name('skewX')
+    gui.add(this.options, 'skewFactor').min(0).max(70).step(1).name('Skew X:')
       .onChange((value) => {
         this.options.skewFactor = value;
       });
-    gui.add(this.options, 'parentRotation').min(-90).max(90).step(1).name('Parent rotation')
+    gui.add(this.options, 'parentRotation').min(-90).max(90).step(1).name('Parent rotation:')
       .onChange((value) => {
         this.options.parentRotation = value;
         this.setInitialStyles();
