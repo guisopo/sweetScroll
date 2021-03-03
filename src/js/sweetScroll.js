@@ -18,6 +18,7 @@ export default class SweetScroll {
       skewFactor: options.skewFactor || 0,
       scaleFactorX: options.scaleFactorX || 0,
       scaleFactorY: options.scaleFactorY || 0,
+      parentRotation: options.parentRotation || -4
     }
 
     this.observer = null;
@@ -59,6 +60,7 @@ export default class SweetScroll {
   setInitialStyles() {
     document.body.style.overscrollBehavior = 'none';
     document.body.style.overflow = 'hidden';
+    this.slider.parentNode.style.transform = `rotate(${this.options.parentRotation}deg)`;
   }
 
   setBounds() {
@@ -184,9 +186,9 @@ export default class SweetScroll {
   addDebuger() {
     const gui = new dat.GUI(({ width: 400 }));
 
-    gui.hide();
+    // gui.hide();
 
-    gui.add(this.options, 'ease').min(0).max(0.75).step(0.001).name('Scroll ease')
+    gui.add(this.options, 'ease').min(0.1).max(1).step(0.01).name('Scroll ease')
       .onChange((value) => {
         this.options.ease = value;
       });
@@ -205,6 +207,11 @@ export default class SweetScroll {
     gui.add(this.options, 'skewFactor').min(0).max(70).step(1).name('skewX')
       .onChange((value) => {
         this.options.skewFactor = value;
+      });
+    gui.add(this.options, 'parentRotation').min(-90).max(90).step(1).name('Parent rotation')
+      .onChange((value) => {
+        this.options.parentRotation = value;
+        this.setInitialStyles();
       });
   }
 
