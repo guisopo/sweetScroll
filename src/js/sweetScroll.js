@@ -6,6 +6,8 @@ import { clamp, lerp } from './utils/mathFunctions';
 // 3. imagesLoader
 // 4. add scroll bar
 // 5. easings
+// 6. add key events
+// 7. handle pointer events when scrolling
 
 export default class SweetScroll {
   constructor(options = {}) {
@@ -18,7 +20,10 @@ export default class SweetScroll {
       skewFactor: options.skewFactor || 0,
       scaleFactorX: options.scaleFactorX || 0,
       scaleFactorY: options.scaleFactorY || 0,
-      parentRotation: options.parentRotation || -4
+      parentRotation: options.parentRotation || -4,
+      itemsRotation: options.itemsRotation || 0,
+      itemsSkewX: options.itemSkewX || 0,
+      itemsSkewY: options.itemSkewY || 0,
     }
 
     this.observer = null;
@@ -61,6 +66,12 @@ export default class SweetScroll {
     document.body.style.overscrollBehavior = 'none';
     document.body.style.overflow = 'hidden';
     this.slider.parentNode.style.transform = `rotate(${this.options.parentRotation}deg)`;
+    this.sliderItems.forEach(item => {
+      item.style.transform = `
+        rotate(${this.options.itemsRotation}deg)
+        skew(${this.options.itemsSkewX}deg, ${this.options.itemsSkewY}deg)
+      `;
+    });
   }
 
   setBounds() {
@@ -198,15 +209,15 @@ export default class SweetScroll {
       .onChange((value) => {
         this.options.dragFactor = value;
       });
-    gui.add(this.options, 'scaleFactorX').min(0).max(3).step(0.1).name('Scale X:')
+    gui.add(this.options, 'scaleFactorX').min(0).max(3).step(0.1).name('Scale factor X:')
       .onChange((value) => {
         this.options.scaleFactorX = value;
       });
-    gui.add(this.options, 'scaleFactorY').min(0).max(3).step(0.1).name('Scale Y:')
+    gui.add(this.options, 'scaleFactorY').min(0).max(3).step(0.1).name('Scale factor Y:')
       .onChange((value) => {
         this.options.scaleFactorY = value;
       });
-    gui.add(this.options, 'skewFactor').min(0).max(70).step(1).name('Skew X:')
+    gui.add(this.options, 'skewFactor').min(0).max(70).step(1).name('Skew factor X:')
       .onChange((value) => {
         this.options.skewFactor = value;
       });
@@ -215,8 +226,23 @@ export default class SweetScroll {
         this.options.parentRotation = value;
         this.setInitialStyles();
       });
-    this.options.consoleLogData = () => console.log(this.options);
-    gui.add(this.options, 'consoleLogData').name('Console.log data');
+    gui.add(this.options, 'itemsRotation').min(-90).max(90).step(1).name('Items rotation:')
+      .onChange((value) => {
+        this.options.itemsRotation = value;
+        this.setInitialStyles();
+      });
+    gui.add(this.options, 'itemsSkewX').min(-45).max(45).step(1).name('Items skew X:')
+      .onChange((value) => {
+        this.options.itemsSkewX = value;
+        this.setInitialStyles();
+      });
+    gui.add(this.options, 'itemsSkewY').min(-45).max(45).step(1).name('Items skew Y:')
+      .onChange((value) => {
+        this.options.itemsSkewY = value;
+        this.setInitialStyles();
+      });
+    this.options.consoleLogOptions = () => console.log(`const sweetScrollOptions = ${JSON.stringify(this.options)}`);
+    gui.add(this.options, 'consoleLogOptions').name('Console.log options');
   }
 
   init() {
