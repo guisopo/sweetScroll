@@ -215,6 +215,8 @@ export default class SweetScroll {
         this.options.parentRotation = value;
         this.setInitialStyles();
       });
+    this.options.consoleLogData = () => console.log(this.options);
+    gui.add(this.options, 'consoleLogData').name('Console.log data');
   }
 
   init() {
