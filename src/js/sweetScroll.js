@@ -2,9 +2,13 @@ import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
 // 1. Drag and drop
-// 2. Scroll Loop
-// 3. imagesLoader
-// 4. add scroll bar
+// 2. imagesLoader
+// 3. add scroll bar
+// 3. Scroll automatically
+// 3. Animate when first entering and initialize
+// 3. Add color background
+// 3. Yelvy scroll style
+// 4. Scroll Loop
 // 5. easings
 // 6. add key events
 // 7. handle pointer events when scrolling
@@ -63,9 +67,12 @@ export default class SweetScroll {
   }
 
   setInitialStyles() {
+    // Body
     document.body.style.overscrollBehavior = 'none';
     document.body.style.overflow = 'hidden';
+    // Slider
     this.slider.parentNode.style.transform = `rotate(${this.options.parentRotation}deg)`;
+    // Slider items
     this.sliderItems.forEach(item => {
       item.style.transform = `
         rotate(${this.options.itemsRotation}deg)
@@ -169,6 +176,7 @@ export default class SweetScroll {
     this.dragPoint.lastX = this.scroll.current;
     this.slider.removeEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
+    this.slider.addEventListener('touchmove', this.onPointerMove, { passive: true });
     this.slider.addEventListener('pointerup', this.onPointerUp, { passive: true });
   }
 
@@ -184,15 +192,15 @@ export default class SweetScroll {
 
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
     this.slider.removeEventListener('pointermove', this.onPointerMove, { passive: true });
+    this.slider.removeEventListener('touchmove', this.onPointerMove, { passive: true });
     this.slider.removeEventListener('pointerup', this.onPointerUp, { passive: true });
   }
 
   addEvents() {
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointerdown', this.onPointerDown, { passive: true });
-    // this.slider.addEventListener('touchstart', this.onPointerDown, { passive: true });
-    // this.slider.addEventListener('touchmove', this.onPointerMove, { passive: true });
-    // this.slider.addEventListener('touchend', this.onPointerUp, { passive: true });
+    this.slider.addEventListener('touchstart', this.onPointerDown, { passive: true });
+    this.slider.addEventListener('touchend', this.onPointerUp, { passive: true });
     window.addEventListener('resize', this.setBounds);
   }
 
