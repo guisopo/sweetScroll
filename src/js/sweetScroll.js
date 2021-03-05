@@ -21,7 +21,7 @@ export default class SweetScroll {
     }
 
     this.options = {
-      wheelStrength: this.wheelStrength || 1,
+      wheelStrength: options.wheelStrength || 1,
       ease: options.ease || 0.1,
       autoScrollAmount: options.autoScroll || 0.5,
       dragFactor: options.dragFactor || 4,
@@ -99,7 +99,7 @@ export default class SweetScroll {
   }
 
   onWheel(e) {
-    this.scroll.delta = e.deltaY/this.options.wheelStrength || e.deltaX/this.options.wheelStrength;
+    this.scroll.delta = e.deltaY * this.options.wheelStrength || e.deltaX * this.options.wheelStrength;
     this.setDirection();
   }
 
@@ -218,53 +218,47 @@ export default class SweetScroll {
   }
 
   addDebuger() {
-    const gui = new dat.GUI(({ width: 400 }));
+    const gui = new dat.GUI({ width: 400 });
 
     // gui.hide();
 
     const scrollVariablesFolder = gui.addFolder('Scroll variables:');
+    scrollVariablesFolder.open();
     scrollVariablesFolder.add(this.options, 'ease', 0.05, 1, 0.025).name('Scroll ease:')
-      .onChange((value) => {
-        this.options.ease = value;
-      });
+      .onChange(value => this.options.ease = value);
+    scrollVariablesFolder.add(this.options, 'wheelStrength', 0.05, 1, 0.025).name('Wheel strength:')
+      .onChange(value => this.options.wheelStrength = value);
     scrollVariablesFolder.add(this.scroll, 'auto').name('Scroll automatically:');
     scrollVariablesFolder.add(this.options, 'dragFactor', 1, 10, 0.1).name('Drag factor:')
-      .onChange((value) => {
-        this.options.dragFactor = value;
-      });
+      .onChange(value => this.options.dragFactor = value);
+
 
     const sliderVariablesFolder = gui.addFolder('Slider variables:');
     sliderVariablesFolder.add(this.options, 'scaleFactorX', 0, 3, 0.1).name('Scale factor X:')
-      .onChange((value) => {
-        this.options.scaleFactorX = value;
-      });
+      .onChange(value => this.options.scaleFactorX = value);
     sliderVariablesFolder.add(this.options, 'scaleFactorY', 0, 3, 0.1).name('Scale factor Y:')
-      .onChange((value) => {
-        this.options.scaleFactorY = value;
-      });
+      .onChange(value => this.options.scaleFactorY = value);
     sliderVariablesFolder.add(this.options, 'skewFactor', 0, 70, 1).name('Skew factor X:')
-      .onChange((value) => {
-        this.options.skewFactor = value;
-      });
+      .onChange(value => this.options.skewFactor = value);
     sliderVariablesFolder.add(this.options, 'parentRotation', -90, 90, 1).name('Slider rotation:')
-      .onChange((value) => {
+      .onChange(value => {
         this.options.parentRotation = value;
         this.setInitialStyles();
       });
     
-    const itemsVariablesFolder = gui.addFolder('Items variables:')
+    const itemsVariablesFolder = gui.addFolder('Items variables:');
     itemsVariablesFolder.add(this.options, 'itemsRotation', -90, 90, 1).name('Items rotation:')
-      .onChange((value) => {
+      .onChange(value => {
         this.options.itemsRotation = value;
         this.setInitialStyles();
       });
     itemsVariablesFolder.add(this.options, 'itemsSkewX', -45, 45, 1).name('Items skew X:')
-      .onChange((value) => {
+      .onChange(value => {
         this.options.itemsSkewX = value;
         this.setInitialStyles();
       });
     itemsVariablesFolder.add(this.options, 'itemsSkewY', -45, 45, 1).name('Items skew Y:')
-      .onChange((value) => {
+      .onChange(value => {
         this.options.itemsSkewY = value;
         this.setInitialStyles();
       });
@@ -276,9 +270,9 @@ export default class SweetScroll {
   init() {
     this.setInitialStyles();
     this.bindAll();
-    this.addDebuger();
     this.setBounds();
     this.addEvents();
+    this.addDebuger();
     // this.createObserver();
     this.run();
   }
