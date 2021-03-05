@@ -23,7 +23,7 @@ export default class SweetScroll {
     this.options = {
       wheelStrength: options.wheelStrength || 1,
       ease: options.ease || 0.1,
-      autoScrollAmount: options.autoScroll || 0,
+      autoScrollDelta: options.autoScroll || 0,
       dragFactor: options.dragFactor || 4,
       skewFactor: options.skewFactor || 0,
       scaleFactorX: options.scaleFactorX || 0,
@@ -108,7 +108,7 @@ export default class SweetScroll {
   }
 
   autoScroll() {
-    this.scroll.current += this.options.autoScrollAmount
+    this.scroll.current += this.options.autoScrollDelta;
   }
 
   setDirection() {
@@ -138,12 +138,8 @@ export default class SweetScroll {
   styleSlider() {
     this.slider.style.transform = '';
     this.transform.translateX > 0 ? this.slider.style.transform += `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)` : '';
-    this.transform.skewX > 0 ? this.slider.style.transform += `skew(${this.transform.skewX}deg, 0)` : '';
+    Math.abs(this.transform.skewX) > 0 ? this.slider.style.transform += `skew(${this.transform.skewX}deg, 0)` : '';
     this.transform.scaleY < 0.999 ? this.slider.style.transform += `scale(${this.transform.scaleX}, ${this.transform.scaleY})` : '';
-    // this.slider.style.transform = `
-    //   matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1) 
-    //   skew(${this.transform.skewX}deg, 0)
-    //   scale(${this.transform.scaleX}, ${this.transform.scaleY})`;
   }
 
   run() {
@@ -182,7 +178,7 @@ export default class SweetScroll {
   onPointerDown(e) {
     this.state.isDragging = true;
     
-    if(this.options.autoScrollAmount) {
+    if(this.options.autoScrollDelta) {
       this.scroll.auto = false;
     }
 
@@ -204,7 +200,7 @@ export default class SweetScroll {
   onPointerUp(e) {
     this.state.isDragging = false;
 
-    if(this.options.autoScrollAmount) {
+    if(this.options.autoScrollDelta) {
       this.scroll.auto = true;
     }
 
@@ -217,7 +213,7 @@ export default class SweetScroll {
   }
 
   addEvents() {
-    Math.abs(this.options.autoScrollAmount) > 0 ? this.scroll.auto = true : '';
+    Math.abs(this.options.autoScrollDelta) > 0 ? this.scroll.auto = true : '';
 
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointerdown', this.onPointerDown, { passive: true });
@@ -237,21 +233,21 @@ export default class SweetScroll {
     scrollVariablesFolder.open();
     scrollVariablesFolder.add(this.options, 'ease', 0.05, 1, 0.025).name('Scroll ease:')
       .onChange(value => this.options.ease = value);
-    scrollVariablesFolder.add(this.options, 'wheelStrength', 0.05, 1, 0.025).name('Wheel strength:')
+    scrollVariablesFolder.add(this.options, 'wheelStrength', 0.05, 2, 0.025).name('Wheel strength:')
       .onChange(value => this.options.wheelStrength = value);
     scrollVariablesFolder.add(this.options, 'dragFactor', 1, 10, 0.1).name('Drag factor:')
       .onChange(value => this.options.dragFactor = value);
     scrollVariablesFolder.add(this.scroll, 'auto').name('Scroll automatically:')
       .onChange(value => {
         if(value) {
-          this.options.autoScrollAmount ? this.options.autoScrollAmount : this.options.autoScrollAmount = autoScrollCache
+          this.options.autoScrollDelta ? this.options.autoScrollDelta : this.options.autoScrollDelta = autoScrollCache
         } else {
-          autoScrollCache = this.options.autoScrollAmount;
-          this.options.autoScrollAmount = 0;
+          autoScrollCache = this.options.autoScrollDelta;
+          this.options.autoScrollDelta = 0;
         }
       });
-    scrollVariablesFolder.add(this.options, 'autoScrollAmount', 0, 2, 0.25).name('Scroll auto amount:')
-      .onChange(value => this.options.autoScrollAmount = value);
+    scrollVariablesFolder.add(this.options, 'autoScrollDelta', 0, 2, 0.25).name('Scroll auto amount:')
+      .onChange(value => this.options.autoScrollDelta = value);
 
 
     const sliderVariablesFolder = gui.addFolder('Slider variables:');
