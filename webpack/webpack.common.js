@@ -17,8 +17,19 @@ module.exports = {
     rules: [
       // HTML
       {
-        test: /\.(html)$/,
-        use: ['html-loader']
+        test: /\.html$/i,
+        loader: 'html-loader',
+        options: {
+          attributes: {
+            list: [
+              {
+                tag: 'img',
+                attribute: 'data-src',
+                type: 'src',
+              },
+            ],
+          }
+        }
       },
 
       // JS

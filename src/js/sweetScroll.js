@@ -2,7 +2,7 @@ import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
 // 1. Drag and drop
-// 2. imagesLoader
+// 2. imagesLoaded
 // 3. add scroll bar
 // 3. Scroll automatically
 // 3. Animate when first entering and initialize
