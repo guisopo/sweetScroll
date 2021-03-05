@@ -2,24 +2,28 @@ import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
 // 1. Drag and drop
-// 2. imagesLoaded
 // 3. add scroll bar
-// 3. Scroll automatically
 // 3. Animate when first entering and initialize
-// 3. Add color background
 // 3. Yelvy scroll style
 // 4. Scroll Loop
 // 5. easings
 // 6. add key events
-// 7. handle pointer events when scrolling
+// 7. handle pointer events when scrolling and dragging
 
 export default class SweetScroll {
   constructor(options = {}) {
     this.slider = document.querySelector('[data-scroll]');
     this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')]
 
+    this.state = {
+      isDragging: false,
+      isScrolling: false
+    }
+
     this.options = {
+      wheelStrength: this.wheelStrength || 1,
       ease: options.ease || 0.1,
+      autoScrollAmount: options.autoScroll || 0.5,
       dragFactor: options.dragFactor || 4,
       skewFactor: options.skewFactor || 0,
       scaleFactorX: options.scaleFactorX || 0,
@@ -33,8 +37,6 @@ export default class SweetScroll {
     this.observer = null;
 
     this.scrollTicking = false;
-    this.isScrolling = false;
-    this.isDragging = false;
 
     this.dragPoint = {
       initialX: null,
@@ -50,7 +52,8 @@ export default class SweetScroll {
       last: 0,
       speed: 0,
       acc: 0,
-      direction: null
+      direction: null,
+      auto: false
     };
 
     this.transform = {
@@ -96,7 +99,7 @@ export default class SweetScroll {
   }
 
   onWheel(e) {
-    this.scroll.delta = e.deltaY || e.deltaX;
+    this.scroll.delta = e.deltaY/this.options.wheelStrength || e.deltaX/this.options.wheelStrength;
     this.setDirection();
   }
 
@@ -135,12 +138,17 @@ export default class SweetScroll {
       scale(${this.transform.scaleX}, ${this.transform.scaleY})`;
   }
 
+  autoScroll() {
+    this.scroll.current += this.options.autoScrollAmount;
+  }
+
   run() {
     if(!this.scrollTicking) {
       requestAnimationFrame(() => this.run());
       this.scrollTicking = true;
     }
     
+    this.scroll.auto === true ? this.autoScroll() : '';
     this.calculateSliderPosition();
     this.calculateSpeed();
     this.calculateTransform();
@@ -169,11 +177,13 @@ export default class SweetScroll {
   }
 
   onPointerDown(e) {
-    this.isDragging = true;
+    this.state.isDragging = true;
+    this.scroll.auto = false;
 
     this.dragPoint.initialX = e.pageX;
     this.dragPoint.initialY = e.pageY;
     this.dragPoint.lastX = this.scroll.current;
+
     this.slider.removeEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
     this.slider.addEventListener('touchmove', this.onPointerMove, { passive: true });
@@ -186,8 +196,9 @@ export default class SweetScroll {
   }
 
   onPointerUp(e) {
-    this.isDragging = false;
-    
+    this.state.isDragging = false;
+    this.scroll.auto = true;
+
     this.dragPoint.lastX = this.scroll.current;
 
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
@@ -197,6 +208,8 @@ export default class SweetScroll {
   }
 
   addEvents() {
+    Math.abs(this.options.autoScrollAmount) > 0 ? this.scroll.auto = true : '';
+
     this.slider.addEventListener('wheel', this.onWheel, { passive: true });
     this.slider.addEventListener('pointerdown', this.onPointerDown, { passive: true });
     this.slider.addEventListener('touchstart', this.onPointerDown, { passive: true });
@@ -207,50 +220,57 @@ export default class SweetScroll {
   addDebuger() {
     const gui = new dat.GUI(({ width: 400 }));
 
-    gui.hide();
+    // gui.hide();
 
-    gui.add(this.options, 'ease').min(0.1).max(1).step(0.01).name('Scroll ease:')
+    const scrollVariablesFolder = gui.addFolder('Scroll variables:');
+    scrollVariablesFolder.add(this.options, 'ease', 0.05, 1, 0.025).name('Scroll ease:')
       .onChange((value) => {
         this.options.ease = value;
       });
-    gui.add(this.options, 'dragFactor').min(1).max(10).step(0.001).name('Drag factor:')
+    scrollVariablesFolder.add(this.scroll, 'auto').name('Scroll automatically:');
+    scrollVariablesFolder.add(this.options, 'dragFactor', 1, 10, 0.1).name('Drag factor:')
       .onChange((value) => {
         this.options.dragFactor = value;
       });
-    gui.add(this.options, 'scaleFactorX').min(0).max(3).step(0.1).name('Scale factor X:')
+
+    const sliderVariablesFolder = gui.addFolder('Slider variables:');
+    sliderVariablesFolder.add(this.options, 'scaleFactorX', 0, 3, 0.1).name('Scale factor X:')
       .onChange((value) => {
         this.options.scaleFactorX = value;
       });
-    gui.add(this.options, 'scaleFactorY').min(0).max(3).step(0.1).name('Scale factor Y:')
+    sliderVariablesFolder.add(this.options, 'scaleFactorY', 0, 3, 0.1).name('Scale factor Y:')
       .onChange((value) => {
         this.options.scaleFactorY = value;
       });
-    gui.add(this.options, 'skewFactor').min(0).max(70).step(1).name('Skew factor X:')
+    sliderVariablesFolder.add(this.options, 'skewFactor', 0, 70, 1).name('Skew factor X:')
       .onChange((value) => {
         this.options.skewFactor = value;
       });
-    gui.add(this.options, 'parentRotation').min(-90).max(90).step(1).name('Parent rotation:')
+    sliderVariablesFolder.add(this.options, 'parentRotation', -90, 90, 1).name('Slider rotation:')
       .onChange((value) => {
         this.options.parentRotation = value;
         this.setInitialStyles();
       });
-    gui.add(this.options, 'itemsRotation').min(-90).max(90).step(1).name('Items rotation:')
+    
+    const itemsVariablesFolder = gui.addFolder('Items variables:')
+    itemsVariablesFolder.add(this.options, 'itemsRotation', -90, 90, 1).name('Items rotation:')
       .onChange((value) => {
         this.options.itemsRotation = value;
         this.setInitialStyles();
       });
-    gui.add(this.options, 'itemsSkewX').min(-45).max(45).step(1).name('Items skew X:')
+    itemsVariablesFolder.add(this.options, 'itemsSkewX', -45, 45, 1).name('Items skew X:')
       .onChange((value) => {
         this.options.itemsSkewX = value;
         this.setInitialStyles();
       });
-    gui.add(this.options, 'itemsSkewY').min(-45).max(45).step(1).name('Items skew Y:')
+    itemsVariablesFolder.add(this.options, 'itemsSkewY', -45, 45, 1).name('Items skew Y:')
       .onChange((value) => {
         this.options.itemsSkewY = value;
         this.setInitialStyles();
       });
+    
     this.options.consoleLogOptions = () => console.log(`const sweetScrollOptions = ${JSON.stringify(this.options)}`);
-    gui.add(this.options, 'consoleLogOptions').name('Console.log options');
+    gui.add(this.options, 'consoleLogOptions').name('Log options in console');
   }
 
   init() {
