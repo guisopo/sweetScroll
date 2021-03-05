@@ -124,7 +124,7 @@ export default class SweetScroll {
   }
 
   calculateSpeed() {
-    this.scroll.speed = (this.scroll.current - this.scroll.last).toFixed(2);
+    this.scroll.speed = (this.scroll.current - this.scroll.last).toFixed(3);
     this.scroll.acc = this.scroll.speed / this.limitScroll;
   }
 
@@ -139,7 +139,7 @@ export default class SweetScroll {
     this.slider.style.transform = '';
     this.transform.translateX > 0 ? this.slider.style.transform += `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)` : '';
     this.transform.skewX > 0 ? this.slider.style.transform += `skew(${this.transform.skewX}deg, 0)` : '';
-    this.transform.scaleY < 0.99 ? this.slider.style.transform += `scale(${this.transform.scaleX}, ${this.transform.scaleY})` : '';
+    this.transform.scaleY < 0.999 ? this.slider.style.transform += `scale(${this.transform.scaleX}, ${this.transform.scaleY})` : '';
     // this.slider.style.transform = `
     //   matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1) 
     //   skew(${this.transform.skewX}deg, 0)
