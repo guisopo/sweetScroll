@@ -2,9 +2,9 @@ import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
 // 1. Drag and drop
-// 4. Scroll Loop
-// 3. Animate when first entering and initialize
+// 4. Scroll Loop: animate just items and give them different easings
 // 5. easings
+// 3. Animate when first entering and initialize
 // 3. add scroll bar
 // 3. Yelvy scroll style
 // 6. add key events
@@ -30,8 +30,6 @@ export default class SweetScroll {
       scaleFactorY: options.scaleFactorY || 0,
       parentRotation: options.parentRotation || 0,
       itemsRotation: options.itemsRotation || 0,
-      itemsSkewX: options.itemSkewX || 0,
-      itemsSkewY: options.itemSkewY || 0,
     }
 
     this.observer = null;
@@ -77,12 +75,7 @@ export default class SweetScroll {
     this.slider.parentNode.style.transform = `rotate(${this.options.parentRotation}deg)`;
     // Slider items
     this.sliderItems.forEach(item => {
-      item.style.transform = `
-        rotate(${this.options.itemsRotation}deg)
-        skew(${this.options.itemsSkewX}deg, ${this.options.itemsSkewY}deg)
-      `;
-      // const itemImage = item.getElementsByTagName('img');
-      // if(itemImage !== 'undefined') itemImage.style.transform = `skew(${this.options.itemsSkewX * -1}deg, ${this.options.itemsSkewY  * -1}deg)`;
+      item.style.transform = `rotate(${this.options.itemsRotation}deg)`;
     });
   }
 
@@ -133,7 +126,7 @@ export default class SweetScroll {
   calculateTransform() {
     this.transform.translateX = this.scroll.last.toFixed(3);
     this.transform.skewX = (this.scroll.acc * this.options.skewFactor).toFixed(3);
-    this.transform.scaleX = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorX);
+    this.transform.scaleX = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorX).toFixed(3);
     this.transform.scaleY = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorY).toFixed(3);
   }
 
@@ -248,9 +241,8 @@ export default class SweetScroll {
           this.options.autoScrollDelta = 0;
         }
       });
-    scrollVariablesFolder.add(this.options, 'autoScrollDelta', 0, 2, 0.25).name('Scroll auto amount:')
+    scrollVariablesFolder.add(this.options, 'autoScrollDelta', 0, 2, 0.25).name('Scroll auto delta:')
       .onChange(value => this.options.autoScrollDelta = value);
-
 
     const sliderVariablesFolder = gui.addFolder('Slider variables:');
     sliderVariablesFolder.add(this.options, 'scaleFactorX', 0, 3, 0.1).name('Scale factor X:')
@@ -269,16 +261,6 @@ export default class SweetScroll {
     itemsVariablesFolder.add(this.options, 'itemsRotation', -90, 90, 1).name('Items rotation:')
       .onChange(value => {
         this.options.itemsRotation = value;
-        this.setInitialStyles();
-      });
-    itemsVariablesFolder.add(this.options, 'itemsSkewX', -45, 45, 1).name('Items skew X:')
-      .onChange(value => {
-        this.options.itemsSkewX = value;
-        this.setInitialStyles();
-      });
-    itemsVariablesFolder.add(this.options, 'itemsSkewY', -45, 45, 1).name('Items skew Y:')
-      .onChange(value => {
-        this.options.itemsSkewY = value;
         this.setInitialStyles();
       });
     
