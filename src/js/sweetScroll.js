@@ -35,7 +35,7 @@ export default class SweetScroll {
     }
 
     this.observer = null;
-
+    this.rafId = null;
     this.scrollTicking = false;
 
     this.dragPoint = {
@@ -81,6 +81,8 @@ export default class SweetScroll {
         rotate(${this.options.itemsRotation}deg)
         skew(${this.options.itemsSkewX}deg, ${this.options.itemsSkewY}deg)
       `;
+      // const itemImage = item.getElementsByTagName('img');
+      // if(itemImage !== 'undefined') itemImage.style.transform = `skew(${this.options.itemsSkewX * -1}deg, ${this.options.itemsSkewY  * -1}deg)`;
     });
   }
 
@@ -144,7 +146,7 @@ export default class SweetScroll {
 
   run() {
     if(!this.scrollTicking) {
-      requestAnimationFrame(() => this.run());
+      this.rafId = requestAnimationFrame(() => this.run());
       this.scrollTicking = true;
     }
 
@@ -186,10 +188,10 @@ export default class SweetScroll {
     this.dragPoint.initialY = e.pageY;
     this.dragPoint.lastX = this.scroll.current;
 
-    this.slider.removeEventListener('wheel', this.onWheel, { passive: true });
-    this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
-    this.slider.addEventListener('touchmove', this.onPointerMove, { passive: true });
-    this.slider.addEventListener('pointerup', this.onPointerUp, { passive: true });
+    document.removeEventListener('wheel', this.onWheel, { passive: true });
+    document.addEventListener('pointermove', this.onPointerMove, { passive: true });
+    document.addEventListener('touchmove', this.onPointerMove, { passive: true });
+    document.addEventListener('pointerup', this.onPointerUp, { passive: true });
   }
 
   onPointerMove(e) {
@@ -206,19 +208,19 @@ export default class SweetScroll {
 
     this.dragPoint.lastX = this.scroll.current;
 
-    this.slider.addEventListener('wheel', this.onWheel, { passive: true });
-    this.slider.removeEventListener('pointermove', this.onPointerMove, { passive: true });
-    this.slider.removeEventListener('touchmove', this.onPointerMove, { passive: true });
-    this.slider.removeEventListener('pointerup', this.onPointerUp, { passive: true });
+    document.addEventListener('wheel', this.onWheel, { passive: true });
+    document.removeEventListener('pointermove', this.onPointerMove, { passive: true });
+    document.removeEventListener('touchmove', this.onPointerMove, { passive: true });
+    document.removeEventListener('pointerup', this.onPointerUp, { passive: true });
   }
 
   addEvents() {
     Math.abs(this.options.autoScrollDelta) > 0 ? this.scroll.auto = true : '';
 
-    this.slider.addEventListener('wheel', this.onWheel, { passive: true });
-    this.slider.addEventListener('pointerdown', this.onPointerDown, { passive: true });
-    this.slider.addEventListener('touchstart', this.onPointerDown, { passive: true });
-    this.slider.addEventListener('touchend', this.onPointerUp, { passive: true });
+    document.addEventListener('wheel', this.onWheel, { passive: true });
+    document.addEventListener('pointerdown', this.onPointerDown, { passive: true });
+    document.addEventListener('touchstart', this.onPointerDown, { passive: true });
+    document.addEventListener('touchend', this.onPointerUp, { passive: true });
     window.addEventListener('resize', this.setBounds);
   }
 
