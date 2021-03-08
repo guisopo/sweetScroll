@@ -1,7 +1,6 @@
 import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
-// 1. Mouse events
 // 5. easings
 // 4. Scroll Loop: animate just items and give them different easings
 // 3. Animate when first entering and initialize
@@ -9,6 +8,7 @@ import { clamp, lerp } from './utils/mathFunctions';
 // 3. Yelvy scroll style
 // 6. add key events
 // 7. handle pointer events when scrolling and dragging
+// 8. refactor code
 
 export default class SweetScroll {
   constructor(options = {}) {
@@ -16,6 +16,7 @@ export default class SweetScroll {
     this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')]
 
     this.state = {
+      isDown: false,
       isDragging: false,
       isScrolling: false
     }
@@ -26,7 +27,6 @@ export default class SweetScroll {
       autoScrollDelta: options.autoScroll || 0,
       dragFactor: options.dragFactor || 4,
       skewFactor: options.skewFactor || 0,
-      scaleFactorX: options.scaleFactorX || 0,
       scaleFactorY: options.scaleFactorY || 0,
       parentRotation: options.parentRotation || 0,
       itemsRotation: options.itemsRotation || 0,
@@ -63,7 +63,7 @@ export default class SweetScroll {
   }
 
   bindAll() {
-    [ 'setBounds', 'addEvents', 'onWheel', 'onPointerDown', 'onPointerUp', 'onPointerMove', 'run']
+    [ 'setBounds', 'addEvents', 'onWheel', 'onPointerDown', 'onPointerUp', 'onPointerMove', 'run', 'preventDefaultClick' ]
       .forEach( fn => this[fn] = this[fn].bind(this));
   }
 
@@ -126,7 +126,6 @@ export default class SweetScroll {
   calculateTransform() {
     this.transform.translateX = this.scroll.last.toFixed(3);
     this.transform.skewX = (this.scroll.acc * this.options.skewFactor).toFixed(3);
-    this.transform.scaleX = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorX).toFixed(3);
     this.transform.scaleY = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorY).toFixed(3);
   }
 
@@ -134,7 +133,8 @@ export default class SweetScroll {
     this.slider.style.transform = '';
     this.transform.translateX > 0 ? this.slider.style.transform += `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)` : '';
     Math.abs(this.transform.skewX) > 0 ? this.slider.style.transform += `skew(${this.transform.skewX}deg, 0)` : '';
-    this.transform.scaleY < 0.999 ? this.slider.style.transform += `scale(${this.transform.scaleX}, ${this.transform.scaleY})` : '';
+    this.transform.scaleY < 0.999 ? this.slider.style.transform += `scale(1, ${this.transform.scaleY})` : '';
+    // this.slider.style.transform += `rotate3d(1, 0, 0, ${this.scroll.acc * 200}deg)`;
   }
 
   run() {
@@ -171,7 +171,11 @@ export default class SweetScroll {
   }
 
   onPointerDown(e) {
-    this.state.isDragging = true;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    this.state.isDown =  'true';
+    this.slider.classList.add('dragging');
 
     if(this.options.autoScrollDelta) {
       this.scroll.auto = false;
@@ -185,26 +189,43 @@ export default class SweetScroll {
 
     if(window.PointerEvent) {
       e.target.setPointerCapture(e.pointerId);
-      this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
-      this.slider.addEventListener('pointerup', this.onPointerUp, { passive: true });
+      this.slider.addEventListener('pointermove', this.onPointerMove);
+      this.slider.addEventListener('pointerup', this.onPointerUp);
     }
-    this.slider.addEventListener('touchmove', this.onPointerMove, { passive: true });
-    this.slider.addEventListener('touchend', this.onPointerUp, { passive: true });
+    this.slider.addEventListener('touchmove', this.onPointerMove);
+    this.slider.addEventListener('touchend', this.onPointerUp);
   }
 
   onPointerMove(e) {
-    if(!this.state.isDragging) return;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    if(!this.state.isDown) return;
+    this.state.isDragging = true;
+
 
     this.dragPoint.delta = (e.pageX - this.dragPoint.initialX) + (e.pageY - this.dragPoint.initialY);
     this.onDrag();
   }
 
   onPointerUp(e) {
-    this.state.isDragging = false;
+    e.preventDefault();
+    e.stopImmediatePropagation();
+
+    this.state.isDown =  'false';
+    this.slider.classList.remove('dragging');
 
     if(this.options.autoScrollDelta) {
-      this.scroll.auto = true;
+      setTimeout(() => this.scroll.auto = true, 1500);
     }
+
+    if(this.state.isDragging) {
+      [...this.slider.querySelectorAll('a')].forEach(link => link.addEventListener('click', this.preventDefaultClick));
+    } else {
+      [...this.slider.querySelectorAll('a')].forEach(link => link.removeEventListener('click', this.preventDefaultClick));
+    }
+
+    this.state.isDragging = false;
 
     this.dragPoint.lastX = this.scroll.current;
 
@@ -212,20 +233,24 @@ export default class SweetScroll {
     
     if(window.PointerEvent) {
       e.target.releasePointerCapture(e.pointerId);
-      this.slider.removeEventListener('pointermove', this.onPointerMove, { passive: true });
-      this.slider.removeEventListener('pointerup', this.onPointerUp, { passive: true });
+      this.slider.removeEventListener('pointermove', this.onPointerMove);
+      this.slider.removeEventListener('pointerup', this.onPointerUp);
     }
 
-    this.slider.removeEventListener('touchmove', this.onPointerMove, { passive: true });
+    this.slider.removeEventListener('touchmove', this.onPointerMove);
+  }
+
+  preventDefaultClick(e) {
+    e.preventDefault();
   }
 
   addEvents() {
     document.addEventListener('wheel', this.onWheel, { passive: true });
 
     if(window.PointerEvent) {
-      document.addEventListener('pointerdown', this.onPointerDown, { passive: true });
+      this.slider.addEventListener('pointerdown', this.onPointerDown);
     } else {
-      document.addEventListener('touchstart', this.onPointerDown, { passive: true });
+      this.slider.addEventListener('touchstart', this.onPointerDown);
     }
 
     window.addEventListener('resize', this.setBounds);
@@ -259,8 +284,6 @@ export default class SweetScroll {
       .onChange(value => this.options.autoScrollDelta = value);
 
     const sliderVariablesFolder = gui.addFolder('Slider variables:');
-    sliderVariablesFolder.add(this.options, 'scaleFactorX', 0, 3, 0.1).name('Scale factor X:')
-      .onChange(value => this.options.scaleFactorX = value);
     sliderVariablesFolder.add(this.options, 'scaleFactorY', 0, 3, 0.1).name('Scale factor Y:')
       .onChange(value => this.options.scaleFactorY = value);
     sliderVariablesFolder.add(this.options, 'skewFactor', 0, 70, 1).name('Skew factor X:')

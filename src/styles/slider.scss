@@ -1,5 +1,5 @@
 :root {
-  --background-color: #000000;
+  --background-color: #1a1a1a;
 }
 
 figure {
@@ -31,7 +31,9 @@ body {
   height: var(--slider-height);
   padding: 50px 0;
   margin: var(--slider-margin);
-  border: var(--slider-border);;
+  border: var(--slider-border);
+
+  // perspective: 1200px;
 
   .slider__container {
     display: grid;
@@ -42,6 +44,13 @@ body {
     height: inherit;
     transform: translate3d(0,0,0) skewX(0deg);
     will-change: transform;
+    cursor: grab;
+    
+    // transform-origin: top 5px;
+
+    &:active {
+      cursor: grabbing
+    }
 
     .item {
       -webkit-user-select: none;  /* Chrome all / Safari all */
@@ -51,12 +60,17 @@ body {
       height: inherit;
       width: calc(var(--slider-height) * 2/3);
       aspect-ratio: 2 / 3;
+      cursor: pointer;
+
+      &:active {
+        cursor: grabbing
+      }
 
       &__link {
         display: block;
         width: inherit;
         height: inherit;
-        pointer-events: none;
+        // pointer-events: none;
       }
 
       &__figure {
