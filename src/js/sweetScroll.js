@@ -1,9 +1,9 @@
 import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
-// 1. Drag and drop
-// 4. Scroll Loop: animate just items and give them different easings
+// 1. Mouse events
 // 5. easings
+// 4. Scroll Loop: animate just items and give them different easings
 // 3. Animate when first entering and initialize
 // 3. add scroll bar
 // 3. Yelvy scroll style
@@ -172,7 +172,7 @@ export default class SweetScroll {
 
   onPointerDown(e) {
     this.state.isDragging = true;
-    
+
     if(this.options.autoScrollDelta) {
       this.scroll.auto = false;
     }
@@ -181,13 +181,20 @@ export default class SweetScroll {
     this.dragPoint.initialY = e.pageY;
     this.dragPoint.lastX = this.scroll.current;
 
-    document.removeEventListener('wheel', this.onWheel, { passive: true });
-    document.addEventListener('pointermove', this.onPointerMove, { passive: true });
-    document.addEventListener('touchmove', this.onPointerMove, { passive: true });
-    document.addEventListener('pointerup', this.onPointerUp, { passive: true });
+    this.slider.removeEventListener('wheel', this.onWheel, { passive: true });
+
+    if(window.PointerEvent) {
+      e.target.setPointerCapture(e.pointerId);
+      this.slider.addEventListener('pointermove', this.onPointerMove, { passive: true });
+      this.slider.addEventListener('pointerup', this.onPointerUp, { passive: true });
+    }
+    this.slider.addEventListener('touchmove', this.onPointerMove, { passive: true });
+    this.slider.addEventListener('touchend', this.onPointerUp, { passive: true });
   }
 
   onPointerMove(e) {
+    if(!this.state.isDragging) return;
+
     this.dragPoint.delta = (e.pageX - this.dragPoint.initialX) + (e.pageY - this.dragPoint.initialY);
     this.onDrag();
   }
@@ -201,19 +208,26 @@ export default class SweetScroll {
 
     this.dragPoint.lastX = this.scroll.current;
 
-    document.addEventListener('wheel', this.onWheel, { passive: true });
-    document.removeEventListener('pointermove', this.onPointerMove, { passive: true });
-    document.removeEventListener('touchmove', this.onPointerMove, { passive: true });
-    document.removeEventListener('pointerup', this.onPointerUp, { passive: true });
+    this.slider.addEventListener('wheel', this.onWheel, { passive: true });
+    
+    if(window.PointerEvent) {
+      e.target.releasePointerCapture(e.pointerId);
+      this.slider.removeEventListener('pointermove', this.onPointerMove, { passive: true });
+      this.slider.removeEventListener('pointerup', this.onPointerUp, { passive: true });
+    }
+
+    this.slider.removeEventListener('touchmove', this.onPointerMove, { passive: true });
   }
 
   addEvents() {
-    Math.abs(this.options.autoScrollDelta) > 0 ? this.scroll.auto = true : '';
-
     document.addEventListener('wheel', this.onWheel, { passive: true });
-    document.addEventListener('pointerdown', this.onPointerDown, { passive: true });
-    document.addEventListener('touchstart', this.onPointerDown, { passive: true });
-    document.addEventListener('touchend', this.onPointerUp, { passive: true });
+
+    if(window.PointerEvent) {
+      document.addEventListener('pointerdown', this.onPointerDown, { passive: true });
+    } else {
+      document.addEventListener('touchstart', this.onPointerDown, { passive: true });
+    }
+
     window.addEventListener('resize', this.setBounds);
   }
 
@@ -269,6 +283,7 @@ export default class SweetScroll {
   }
 
   init() {
+    Math.abs(this.options.autoScrollDelta) > 0 ? this.scroll.auto = true : '';
     this.setInitialStyles();
     this.bindAll();
     this.setBounds();
