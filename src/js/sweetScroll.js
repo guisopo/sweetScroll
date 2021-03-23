@@ -1,18 +1,16 @@
 import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
-// • Styles depends to acc and Acc depends on slider width, fix it
-// • easings
-// • Fix time out
-// • Fix styles of last item
-// • Disable hover pointer-events
 // • Scroll Loop: animate just items and give them different easings
+// • Disable pointer events when scrolling and dragging
+// • Styles depends to acc and Acc depends on slider width, fix it
+// • Fix styles of last item
 // • Animate when first entering and initialize
-// • add scroll bar
+// • Easings
+// • Add scroll bar
 // • Yelvy scroll style
-// • add key events
-// • handle pointer events when scrolling and dragging
-// • refactor code
+// • Add key events
+// • Refactor code
 
 export default class SweetScroll {
   constructor(options = {}) {
