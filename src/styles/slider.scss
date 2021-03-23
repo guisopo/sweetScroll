@@ -1,5 +1,6 @@
 :root {
-  --background-color: #1a1a1a;
+  // --background-color: #1a1a1a;
+  --background-color: #f8f8f8;
 }
 
 figure {
@@ -24,14 +25,14 @@ body {
   --slider-margin: 4.167vw;
 
   // position: fixed;
-  overflow: hidden;
+  // overflow: hidden;
   display: flex;
   align-items: center;
   width: calc(100vw - var(--slider-margin) * 2);
   height: var(--slider-height);
   padding: 50px 0;
   margin: var(--slider-margin);
-  border: var(--slider-border);
+  // border: var(--slider-border);
 
   // perspective: 1200px;
 
@@ -45,7 +46,7 @@ body {
     transform: translate3d(0,0,0) skewX(0deg);
     will-change: transform;
     cursor: grab;
-    
+
     // transform-origin: top 5px;
 
     &:active {

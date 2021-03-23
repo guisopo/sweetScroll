@@ -1,7 +1,9 @@
 import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
+// 1. Styles depends to acc and Acc depends on slider width, fix it
 // 5. easings
+// Fix time out
 // 4. Scroll Loop: animate just items and give them different easings
 // 3. Animate when first entering and initialize
 // 3. add scroll bar
@@ -24,7 +26,7 @@ export default class SweetScroll {
     this.options = {
       wheelStrength: options.wheelStrength || 1,
       ease: options.ease || 0.1,
-      autoScrollDelta: options.autoScroll || 0,
+      autoScrollDelta: options.autoScroll || 0.75,
       dragFactor: options.dragFactor || 4,
       skewFactor: options.skewFactor || 0,
       scaleFactorY: options.scaleFactorY || 0,
@@ -35,6 +37,7 @@ export default class SweetScroll {
     this.observer = null;
     this.rafId = null;
     this.scrollTicking = false;
+    this.timeoutId = undefined;
 
     this.dragPoint = {
       initialX: null,
@@ -216,7 +219,10 @@ export default class SweetScroll {
     this.slider.classList.remove('dragging');
 
     if(this.options.autoScrollDelta) {
-      setTimeout(() => this.scroll.auto = true, 1500);
+      if (typeof this.timeoutId === 'number') {
+        window.clearTimeout(this.timeOutId);
+      }
+      this.timeoutId = window.setTimeout(() => {this.scroll.auto = true}, 2000);
     }
 
     if(this.state.isDragging) {
