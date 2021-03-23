@@ -28,7 +28,7 @@ export default class SweetScroll {
     this.options = {
       wheelStrength: options.wheelStrength || 1,
       ease: options.ease || 0.1,
-      autoScrollDelta: options.autoScroll || 0.75,
+      autoScrollDelta: options.autoScroll || 0,
       dragFactor: options.dragFactor || 4,
       skewFactor: options.skewFactor || 0,
       scaleFactorY: options.scaleFactorY || 0,
@@ -105,6 +105,7 @@ export default class SweetScroll {
 
   onDrag() {
     this.scroll.current = this.dragPoint.lastX - (this.dragPoint.delta * this.options.dragFactor);
+    this.setDirection();
   }
 
   autoScroll() {
@@ -112,7 +113,8 @@ export default class SweetScroll {
   }
 
   setDirection() {
-    this.scroll.delta > 0 ? this.scroll.direction = 'right' : this.scroll.direction = 'left';
+    this.scroll.current - this.scroll.last > 0 ? this.scroll.direction = 'right' : this.scroll.direction = 'left';
+    console.log(this.scroll.direction);
   }
 
   calculateSliderPosition() {
