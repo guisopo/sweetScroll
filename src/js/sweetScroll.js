@@ -1,16 +1,18 @@
 import * as dat from 'dat.gui';
 import { clamp, lerp } from './utils/mathFunctions';
 // TO DO
-// 1. Styles depends to acc and Acc depends on slider width, fix it
-// 5. easings
-// Fix time out
-// 4. Scroll Loop: animate just items and give them different easings
-// 3. Animate when first entering and initialize
-// 3. add scroll bar
-// 3. Yelvy scroll style
-// 6. add key events
-// 7. handle pointer events when scrolling and dragging
-// 8. refactor code
+// • Styles depends to acc and Acc depends on slider width, fix it
+// • easings
+// • Fix time out
+// • Fix styles of last item
+// • Disable hover pointer-events
+// • Scroll Loop: animate just items and give them different easings
+// • Animate when first entering and initialize
+// • add scroll bar
+// • Yelvy scroll style
+// • add key events
+// • handle pointer events when scrolling and dragging
+// • refactor code
 
 export default class SweetScroll {
   constructor(options = {}) {
@@ -220,9 +222,11 @@ export default class SweetScroll {
 
     if(this.options.autoScrollDelta) {
       if (typeof this.timeoutId === 'number') {
-        window.clearTimeout(this.timeOutId);
+        window.clearTimeout(this.timeoutId);
       }
-      this.timeoutId = window.setTimeout(() => {this.scroll.auto = true}, 2000);
+      this.timeoutId = window.setTimeout(() => {
+        this.scroll.auto = true;
+      }, 2000);
     }
 
     if(this.state.isDragging) {
