@@ -11,6 +11,7 @@ import { clamp, lerp } from './utils/mathFunctions';
 // • Yelvy scroll style
 // • Add key events
 // • Refactor code
+// • Build accelerometer, speedometer
 
 export default class SweetScroll {
   constructor(options = {}) {
