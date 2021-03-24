@@ -16,7 +16,8 @@ import { clamp, lerp } from './utils/mathFunctions';
 export default class SweetScroll {
   constructor(options = {}) {
     this.slider = document.querySelector('[data-scroll]');
-    this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')]
+    this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')];
+    this.sliderImages = [...this.slider.querySelectorAll('.slider__image')];
 
     this.state = {
       isDown: false,
@@ -27,7 +28,7 @@ export default class SweetScroll {
     this.options = {
       wheelStrength: options.wheelStrength || 1,
       ease: options.ease || 0.1,
-      autoScrollDelta: options.autoScroll || 0,
+      autoScrollDelta: options.autoScrollDelta || 0,
       dragFactor: options.dragFactor || 4,
       skewFactor: options.skewFactor || 0,
       scaleFactorY: options.scaleFactorY || 0,
@@ -113,7 +114,6 @@ export default class SweetScroll {
 
   setDirection() {
     this.scroll.current - this.scroll.last > 0 ? this.scroll.direction = 'right' : this.scroll.direction = 'left';
-    console.log(this.scroll.direction);
   }
 
   calculateSliderPosition() {
@@ -127,8 +127,16 @@ export default class SweetScroll {
   calculateSpeed() {
     this.scroll.speed = (this.scroll.current - this.scroll.last).toFixed(3);
     this.scroll.acc = this.scroll.speed / this.limitScroll;
-  }
 
+    if(Math.abs(this.scroll.speed) < 1) {
+      this.state.isScrolling === true ? this.handlePointerEvents('all') : '';
+      this.state.isScrolling = false;
+    } else {
+      this.state.isScrolling === false ? this.handlePointerEvents('none') : '';
+      this.state.isScrolling = true;
+    }
+  }
+  
   calculateTransform() {
     this.transform.translateX = this.scroll.last.toFixed(3);
     this.transform.skewX = (this.scroll.acc * this.options.skewFactor).toFixed(3);
@@ -143,6 +151,12 @@ export default class SweetScroll {
     // this.slider.style.transform += `rotate3d(1, 0, 0, ${this.scroll.acc * 200}deg)`;
   }
 
+  handlePointerEvents(prop) {
+    this.sliderImages.forEach(element => {
+      element.style.pointerEvents = prop;
+    });
+  }
+
   run() {
     if(!this.scrollTicking) {
       this.rafId = requestAnimationFrame(() => this.run());
@@ -154,6 +168,7 @@ export default class SweetScroll {
     this.calculateSpeed();
     this.calculateTransform();
     this.styleSlider();
+
     this.scrollTicking = false;
   }
 
@@ -278,7 +293,7 @@ export default class SweetScroll {
     scrollVariablesFolder.open();
     scrollVariablesFolder.add(this.options, 'ease', 0.05, 1, 0.025).name('Scroll ease:')
       .onChange(value => this.options.ease = value);
-    scrollVariablesFolder.add(this.options, 'wheelStrength', 0.05, 2, 0.025).name('Wheel strength:')
+    scrollVariablesFolder.add(this.options, 'wheelStrength', 0.5, 2, 0.25).name('Wheel strength:')
       .onChange(value => this.options.wheelStrength = value);
     scrollVariablesFolder.add(this.options, 'dragFactor', 1, 10, 0.1).name('Drag factor:')
       .onChange(value => this.options.dragFactor = value);
@@ -311,13 +326,14 @@ export default class SweetScroll {
         this.options.itemsRotation = value;
         this.setInitialStyles();
       });
-    
+    console.log(this.options.autoScrollDelta);
     this.options.consoleLogOptions = () => console.log(`const sweetScrollOptions = ${JSON.stringify(this.options)}`);
     gui.add(this.options, 'consoleLogOptions').name('Log options in console');
   }
 
   init() {
     Math.abs(this.options.autoScrollDelta) > 0 ? this.scroll.auto = true : '';
+    console.log(this.scroll.auto);
     this.setInitialStyles();
     this.bindAll();
     this.setBounds();
