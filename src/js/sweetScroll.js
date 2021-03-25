@@ -3,7 +3,6 @@ import { clamp, lerp, norm } from './utils/mathFunctions';
 // TO DO
 // • Scroll Loop: animate just items and give them different easings
 // • Styles depends to acc and Acc depends on slider width, fix it
-// • Fix styles of last item
 // • Animate when first entering and initialize
 // • Easings
 // • Add key events

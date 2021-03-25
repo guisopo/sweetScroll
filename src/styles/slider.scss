@@ -41,7 +41,7 @@ body {
     align-items: center;
     grid-template-columns: repeat((var(--slidesTotal)), 1fr);
     column-gap: 4.167vw;
-    padding: 0 4.167vw;
+    padding-left: 4.167vw;
     height: inherit;
     transform: translate3d(0,0,0) skewX(0deg);
     will-change: transform;
