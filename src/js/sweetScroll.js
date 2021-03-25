@@ -1,8 +1,7 @@
 import * as dat from 'dat.gui';
-import { clamp, lerp } from './utils/mathFunctions';
+import { clamp, lerp, norm } from './utils/mathFunctions';
 // TO DO
 // • Scroll Loop: animate just items and give them different easings
-// • Disable pointer events when scrolling and dragging
 // • Styles depends to acc and Acc depends on slider width, fix it
 // • Fix styles of last item
 // • Animate when first entering and initialize
@@ -18,6 +17,7 @@ export default class SweetScroll {
     this.slider = document.querySelector('[data-scroll]');
     this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')];
     this.sliderImages = [...this.slider.querySelectorAll('.slider__image')];
+    this.progressBar = document.querySelector('[data-scroll-progress]');
 
     this.state = {
       isDown: false,
@@ -151,6 +151,10 @@ export default class SweetScroll {
     // this.slider.style.transform += `rotate3d(1, 0, 0, ${this.scroll.acc * 200}deg)`;
   }
 
+  styleProgressBar() {
+    this.progressBar.style.transform = `scaleX(${norm(this.scroll.last, 0, this.limitScroll)})`;
+  }
+
   handlePointerEvents(prop) {
     this.sliderImages.forEach(element => {
       element.style.pointerEvents = prop;
@@ -168,6 +172,7 @@ export default class SweetScroll {
     this.calculateSpeed();
     this.calculateTransform();
     this.styleSlider();
+    this.styleProgressBar();
 
     this.scrollTicking = false;
   }
@@ -326,14 +331,12 @@ export default class SweetScroll {
         this.options.itemsRotation = value;
         this.setInitialStyles();
       });
-    console.log(this.options.autoScrollDelta);
     this.options.consoleLogOptions = () => console.log(`const sweetScrollOptions = ${JSON.stringify(this.options)}`);
     gui.add(this.options, 'consoleLogOptions').name('Log options in console');
   }
 
   init() {
     Math.abs(this.options.autoScrollDelta) > 0 ? this.scroll.auto = true : '';
-    console.log(this.scroll.auto);
     this.setInitialStyles();
     this.bindAll();
     this.setBounds();
