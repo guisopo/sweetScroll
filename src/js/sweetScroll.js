@@ -6,7 +6,6 @@ import { clamp, lerp, norm } from './utils/mathFunctions';
 // • Fix styles of last item
 // • Animate when first entering and initialize
 // • Easings
-// • Yelvy scroll style
 // • Add key events
 // • Refactor code
 // • Build accelerometer, speedometer
@@ -94,7 +93,7 @@ export default class SweetScroll {
       height: this.slider.offsetHeight
     }
 
-    this.limitScroll = this.sliderSize.width - this.windowSize.width;
+    this.limitScroll = this.sliderSize.width - this.windowSize.width + 140;
   }
 
   onWheel(e) {

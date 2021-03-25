@@ -29,7 +29,6 @@ body {
   // overflow: hidden;
   display: flex;
   align-items: center;
-  width: calc(100vw - var(--slider-margin) * 2);
   height: var(--slider-height);
   padding: 50px 0;
   margin: var(--slider-margin);
@@ -114,7 +113,7 @@ body {
 }
 
 .progress-bar {
-  width: inherit;
+  width: 100%;
   bottom: 0;
   left: 0;
   position: fixed;
