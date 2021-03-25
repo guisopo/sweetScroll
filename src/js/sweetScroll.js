@@ -170,7 +170,7 @@ export default class SweetScroll {
     this.calculateSliderPosition();
     this.calculateSpeed();
 
-    if(!this.state.isScrolling) {
+    if(this.state.isScrolling) {
       this.calculateTransform();
       this.styleSlider();
       this.styleProgressBar();
