@@ -6,7 +6,6 @@ import { clamp, lerp, norm } from './utils/mathFunctions';
 // • Fix styles of last item
 // • Animate when first entering and initialize
 // • Easings
-// • Add scroll bar
 // • Yelvy scroll style
 // • Add key events
 // • Refactor code
@@ -170,9 +169,12 @@ export default class SweetScroll {
     this.scroll.auto === true ? this.autoScroll() : '';
     this.calculateSliderPosition();
     this.calculateSpeed();
-    this.calculateTransform();
-    this.styleSlider();
-    this.styleProgressBar();
+
+    if(!this.state.isScrolling) {
+      this.calculateTransform();
+      this.styleSlider();
+      this.styleProgressBar();
+    }
 
     this.scrollTicking = false;
   }
