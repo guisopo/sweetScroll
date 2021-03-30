@@ -15,6 +15,7 @@ export default class SweetScroll {
     this.sliderItems = [...this.slider.querySelectorAll('[data-scroll-item]')];
     this.sliderImages = [...this.slider.querySelectorAll('.slider__image')];
     this.progressBar = document.querySelector('[data-scroll-progress]');
+    this.itemsInViewport = [];
 
     this.state = {
       isDown: false,
@@ -158,6 +159,10 @@ export default class SweetScroll {
     });
   }
 
+  styleItem(item) {
+    item.style.transform = `skew(${(this.scroll.acc * 40).toFixed(3)}deg, 0)`;
+  }
+
   run() {
     if(!this.scrollTicking) {
       this.rafId = requestAnimationFrame(() => this.run());
@@ -172,6 +177,7 @@ export default class SweetScroll {
       this.calculateTransform();
       this.styleSlider();
       this.styleProgressBar();
+      this.itemsInViewport.forEach(item => this.styleItem(item));
     }
 
     this.scrollTicking = false;
@@ -181,11 +187,13 @@ export default class SweetScroll {
     this.observer = new IntersectionObserver(entries => {
       for (const entry of entries) { 
         const id = Number(entry.target.id);
-        console.log(`${entry.target.id} is in view: ${entry.isIntersecting}`);
-        console.log(`${entries[id + 1]} is ${entries[id + 1].isIntersecting}`);
-        entry.isIntersecting 
-          ? entry.target.style.visibility = 'visible' 
-          : entry.target.style.display = 'hidden';
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+          this.itemsInViewport.push(entry.target);
+        } else {
+          entry.target.classList.remove('visible')
+          this.itemsInViewport = this.itemsInViewport.filter(item => item != entry.target);
+        }
       }
     });
 
@@ -342,7 +350,7 @@ export default class SweetScroll {
     this.setBounds();
     this.addEvents();
     this.addDebuger();
-    // this.createObserver();
+    this.createObserver();
     this.run();
   }
 }
