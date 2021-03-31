@@ -3,6 +3,9 @@ import { clamp, lerp, norm } from './utils/mathFunctions';
 // TO DO
 // • Scroll Loop: animate just items and give them different easings
 // • Styles depends to acc and Acc depends on slider width, fix it
+// • Infinite scroll
+// • Parallax images
+// • Animate clip-path on hover and initialize
 // • Animate when first entering and initialize
 // • Easings
 // • Add key events
@@ -160,7 +163,13 @@ export default class SweetScroll {
   }
 
   styleItem(item) {
-    item.style.transform = `skew(${(this.scroll.acc * 40).toFixed(3)}deg, 0)`;
+    if(item.dataset.speed) {
+      // item.style.transform = `translateX(${this.scroll.speed * item.dataset.speed}px)`;
+      // item.style.transform = `translateX(${-this.scroll.last * item.dataset.speed}px)`;
+      // item.style.transform = `rotate3d(0, 0, 1, ${this.scroll.acc * 200}deg)`;;
+      item.style.transform = `perspective(1000px) rotate3d(0, 1, 0, ${this.scroll.acc * 300}deg)`;;
+
+    } 
   }
 
   run() {

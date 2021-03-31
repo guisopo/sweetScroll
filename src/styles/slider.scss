@@ -34,8 +34,6 @@ body {
   margin: var(--slider-margin);
   // border: var(--slider-border);
 
-  // perspective: 1200px;
-
   .slider__container {
     display: grid;
     align-items: center;
@@ -46,8 +44,6 @@ body {
     transform: translate3d(0,0,0) skewX(0deg);
     will-change: transform;
     cursor: grab;
-
-    // transform-origin: top 5px;
 
     &:active {
       cursor: grabbing
@@ -63,7 +59,8 @@ body {
       aspect-ratio: 2 / 3;
       cursor: pointer;
       will-change: transform;
-
+      transform-style: preserve-3d;
+      
       &:active {
         cursor: grabbing
       }
