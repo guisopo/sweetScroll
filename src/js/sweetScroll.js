@@ -198,6 +198,10 @@ export default class SweetScroll {
   }
 
   createObserver() {
+    const observerOptions = {
+      rootMargin: '20% 20% 20% 20%',
+    };
+
     this.observer = new IntersectionObserver(entries => {
       for (const entry of entries) { 
         const id = Number(entry.target.id);
@@ -209,7 +213,7 @@ export default class SweetScroll {
           this.itemsInViewport = this.itemsInViewport.filter(item => item != entry.target);
         }
       }
-    });
+    }, observerOptions);
 
     this.observeSliderItems();
   }
