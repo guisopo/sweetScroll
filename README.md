@@ -1,6 +1,6 @@
 ## SweetScroll
 
-SweetScroll is a Javascript module to create an horizontal smooth scroll page with optianl CSS transform effects. It uses the __Intersction Observer API__ to animate just the items that are visible in the viewport.
+SweetScroll is a Javascript module to create an horizontal smooth scrolling page with optional CSS transform effects on each children item from the main section. It uses the __Intersction Observer API__ to animate just the items that are visible in the viewport.
 
 ![alt text](https://raw.githubusercontent.com/guisopo/sweetScroll/main/src/images/screenshot.png "Slider screenshot")
 
@@ -52,11 +52,28 @@ const sweetScrollOptions = {
 const slider = new SweetScroll(sweetScrollOptions).init();
 ```
 
+
+## Building your SweetScroll
+
+In the terminal, enter the following:
+
+```
+$ npm install
+$ npm run build
+```
+
+## npm scripts
+
+- npm run build - Build development and production version of scripts.
+- npm run dev - Build development version of script and watch for changes.
+
 ## Dependencies
 
 | Name             | Description                                                        |
 | ---------------- | ------------------------------------------------------------------ |
-| [lazysizes] | A fast (jank-free), SEO-friendly and self-initializing lazyloader for images                         |
+| [lazysizes] | A fast (jank-free), SEO-friendly and self-initializing lazyloader for images |
+| [dat.GUI] | A lightweight graphical user interface for changing variables in JavaScript. |
 
 [instance events]: #instance-events
 [lazysizes]: https://github.com/aFarkas/lazysizes
+[dat.GUI]: https://github.com/dataarts/dat.gui
