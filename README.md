@@ -74,7 +74,7 @@ $ npm run build
 | Name             | Description                                                        |
 | ---------------- | ------------------------------------------------------------------ |
 | [lazysizes] | A fast (jank-free), SEO-friendly and self-initializing lazyloader for images |
-| [dat.GUI] | A lightweight graphical user interface for changing variables in JavaScript. |
+| [dat.GUI] | A lightweight graphical user interface for changing variables in JavaScript |
 
 [instance events]: #instance-events
 [lazysizes]: https://github.com/aFarkas/lazysizes
