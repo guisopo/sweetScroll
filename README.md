@@ -1,4 +1,4 @@
-## SweetScroll
+## SweetScroll 🍭
 
 SweetScroll is a Javascript module to create an horizontal smooth scrolling page with optional CSS transform effects on each children item from the main section. 
 
