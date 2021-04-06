@@ -8,7 +8,7 @@ SweetScroll is a Javascript module to create an horizontal smooth scrolling page
 
 #### `smooth.init()`
 
-Will add all event listeners and DOM elements.
+Will add all event listeners and create the intersection observer.
 
 ### Usage
 
