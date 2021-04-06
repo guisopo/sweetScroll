@@ -8,6 +8,7 @@ import { clamp, lerp, norm } from './utils/mathFunctions';
 // • Animate clip-path on hover and initialize
 // • Animate when first entering and initialize
 // • Easings
+// • Test with mouse wheel
 // • Add key events
 // • Refactor code
 // • Build accelerometer, speedometer
@@ -34,7 +35,16 @@ export default class SweetScroll {
       skewFactor: options.skewFactor || 0,
       scaleFactorY: options.scaleFactorY || 0,
       parentRotation: options.parentRotation || 0,
-      itemsRotation: options.itemsRotation || 0,
+      itemRotateX: options.itemRotateX || false,
+      itemRotateY: options.itemRotateY || false,
+      itemRotateZ: options.itemRotateY || false,
+      rotate3dFactor: options.rotate3dFactor || 0
+    }
+
+    this.item = {
+      rotateX: 0,
+      rotateY: 0,
+      rotateZ: 0,
     }
 
     this.observer = null;
@@ -63,8 +73,8 @@ export default class SweetScroll {
     this.transform = {
       translateX: null,
       skewX: null,
-      scaleX: null,
-      scaleY: null
+      scaleY: null,
+      rotate3d: null
     }
   }
 
@@ -79,10 +89,6 @@ export default class SweetScroll {
     document.body.style.overflow = 'hidden';
     // Slider
     this.slider.parentNode.style.transform = `rotate(${this.options.parentRotation}deg)`;
-    // Slider items
-    this.sliderItems.forEach(item => {
-      item.style.transform = `rotate(${this.options.itemsRotation}deg)`;
-    });
   }
 
   setBounds() {
@@ -142,14 +148,12 @@ export default class SweetScroll {
     this.transform.translateX = this.scroll.last.toFixed(3);
     this.transform.skewX = (this.scroll.acc * this.options.skewFactor).toFixed(3);
     this.transform.scaleY = 1 - Math.abs(this.scroll.acc * this.options.scaleFactorY).toFixed(3);
+    this.transform.rotate3d = this.scroll.acc * this.options.rotate3dFactor;
   }
 
   styleSlider() {
     this.slider.style.transform = '';
     this.transform.translateX > 0 ? this.slider.style.transform += `matrix3d(1,0,0.00,0,0.00,1,0.00,0,0,0,1,0,${-this.scroll.last},0,0,1)` : '';
-    Math.abs(this.transform.skewX) > 0 ? this.slider.style.transform += `skew(${this.transform.skewX}deg, 0)` : '';
-    this.transform.scaleY < 0.999 ? this.slider.style.transform += `scale(1, ${this.transform.scaleY})` : '';
-    // this.slider.style.transform += `rotate3d(1, 0, 0, ${this.scroll.acc * 200}deg)`;
   }
 
   styleProgressBar() {
@@ -164,12 +168,13 @@ export default class SweetScroll {
 
   styleItem(item) {
     if(item.dataset.speed) {
-      // item.style.transform = `translateX(${this.scroll.speed * item.dataset.speed}px)`;
+      item.style.transform = '';
+      item.style.transform += `translateX(${this.scroll.speed * 2 * item.dataset.speed}px)`;
       // item.style.transform = `translateX(${-this.scroll.last * item.dataset.speed}px)`;
-      // item.style.transform = `rotate3d(0, 0, 1, ${this.scroll.acc * 200}deg)`;;
-      item.style.transform = `perspective(1000px) rotate3d(0, 1, 0, ${this.scroll.acc * 300}deg)`;;
-
-    } 
+      item.style.transform += `skew(${this.transform.skewX}deg, 0)`;
+      item.style.transform += `scaleY(${this.transform.scaleY})`;
+      item.style.transform += `perspective(1000px) rotate3d(${this.item.rotateX}, ${this.item.rotateY}, ${this.item.rotateZ}, ${this.transform.rotate3d}deg)`;;
+    }
   }
 
   run() {
@@ -332,10 +337,6 @@ export default class SweetScroll {
       .onChange(value => this.options.autoScrollDelta = value);
 
     const sliderVariablesFolder = gui.addFolder('Slider variables:');
-    sliderVariablesFolder.add(this.options, 'scaleFactorY', 0, 3, 0.1).name('Scale factor Y:')
-      .onChange(value => this.options.scaleFactorY = value);
-    sliderVariablesFolder.add(this.options, 'skewFactor', 0, 70, 1).name('Skew factor X:')
-      .onChange(value => this.options.skewFactor = value);
     sliderVariablesFolder.add(this.options, 'parentRotation', -90, 90, 1).name('Slider rotation:')
       .onChange(value => {
         this.options.parentRotation = value;
@@ -343,11 +344,37 @@ export default class SweetScroll {
       });
     
     const itemsVariablesFolder = gui.addFolder('Items variables:');
-    itemsVariablesFolder.add(this.options, 'itemsRotation', -90, 90, 1).name('Items rotation:')
-      .onChange(value => {
-        this.options.itemsRotation = value;
-        this.setInitialStyles();
-      });
+    itemsVariablesFolder.add(this.options, 'skewFactor', 0, 70, 1).name('Skew factor X:')
+      .onChange(value => this.options.skewFactor = value);
+    itemsVariablesFolder.add(this.options, 'scaleFactorY', 0, 3, 0.1).name('Scale factor Y:')
+    .onChange(value => this.options.scaleFactorY = value);
+    itemsVariablesFolder.add(this.options, 'itemRotateX').name('Rotate X:')
+    .onChange(value => {
+      if(value) {
+        this.item.rotateX = 1;
+      } else {
+        this.item.rotateX = 0;
+      }
+    });
+    itemsVariablesFolder.add(this.options, 'itemRotateY').name('Rotate Y:')
+    .onChange(value => {
+      if(value) {
+        this.item.rotateY = 1;
+      } else {
+        this.item.rotateY = 0;
+      }
+    });
+    itemsVariablesFolder.add(this.options, 'itemRotateZ').name('Item rotate Z:')
+    .onChange(value => {
+      if(value) {
+        this.item.rotateZ = 1;
+      } else {
+        this.item.rotateZ = 0;
+      }
+    });
+    itemsVariablesFolder.add(this.options, 'rotate3dFactor', 0, 600, 50).name('Rotate 3d factor:')
+    .onChange(value => this.options.rotate3dFactor = value);
+
     this.options.consoleLogOptions = () => console.log(`const sweetScrollOptions = ${JSON.stringify(this.options)}`);
     gui.add(this.options, 'consoleLogOptions').name('Log options in console');
   }
