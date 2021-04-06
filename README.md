@@ -1,6 +1,12 @@
 ## SweetScroll
 
-SweetScroll is a Javascript module to create an horizontal smooth scroll page. It uses the __Intersction Observer API__ to animate just the items that are visible in the viewport.
+SweetScroll is a Javascript module to create an horizontal smooth scroll page with optianl CSS transform effects. It uses the __Intersction Observer API__ to animate just the items that are visible in the viewport.
+
+### Methods
+
+#### `smooth.init()`
+
+Will add all event listeners and DOM elements.
 
 ### Usage
 
@@ -22,7 +28,7 @@ SweetScroll is a Javascript module to create an horizontal smooth scroll page. I
   </div>
 </section>
 ```
-
+#### Javascript
 ```javascript
 import 'lazysizes';
 import SweetScroll from './sweetScroll';
@@ -42,15 +48,6 @@ const sweetScrollOptions = {
     }
 
 const slider = new SweetScroll(sweetScrollOptions).init();
-
-const section = document.querySelector('.vs-section')
-const smooth = new Smooth({
-  native: true,
-  section: section,
-  ease: 0.1
-})
-
-smooth.init()
 ```
 
 ## Dependencies
