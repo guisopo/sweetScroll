@@ -1,6 +1,6 @@
 ## SweetScroll 🍭
 
-SweetScroll is a Javascript module to create an horizontal smooth scrolling page with optional CSS transform effects on each children item from the main section. 
+SweetScroll is a Javascript module to create an horizontal virtual smooth scrolling page with optional CSS transform effects on each children item from the main section. 
 
 It uses the __Intersction Observer API__ to improve the performance by animating just the items that are visible in the viewport.
 
@@ -11,6 +11,20 @@ It uses the __Intersction Observer API__ to improve the performance by animating
 #### `smooth.init()`
 
 Will add all event listeners and create the intersection observer.
+
+### Options
+
+- `wheelStrength`: on-scroll events listener & parent container for all elements
+- `ease: 0.1,
+  autoScrollDelta: 0,
+  dragFactor: 4,
+  skewFactor: 0,
+  scaleFactorY: 0,
+  parentRotation:  0,
+  itemRotateX: false,
+  itemRotateY: false,
+  itemRotateZ: false,
+  rotate3dFactor: 0,
 
 ### Usage
 
