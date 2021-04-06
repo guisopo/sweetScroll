@@ -37,7 +37,7 @@ export default class SweetScroll {
       parentRotation: options.parentRotation || 0,
       itemRotateX: options.itemRotateX || false,
       itemRotateY: options.itemRotateY || false,
-      itemRotateZ: options.itemRotateY || false,
+      itemRotateZ: options.itemRotateZ || false,
       rotate3dFactor: options.rotate3dFactor || 0
     }
 
@@ -89,6 +89,10 @@ export default class SweetScroll {
     document.body.style.overflow = 'hidden';
     // Slider
     this.slider.parentNode.style.transform = `rotate(${this.options.parentRotation}deg)`;
+    // Items
+    if(this.options.itemRotateX) this.item.rotateX = 1;
+    if(this.options.itemRotateY) this.item.rotateY = 1;
+    if(this.options.itemRotateZ) this.item.rotateZ = 1;
   }
 
   setBounds() {
@@ -169,7 +173,7 @@ export default class SweetScroll {
   styleItem(item) {
     if(item.dataset.speed) {
       item.style.transform = '';
-      item.style.transform += `translateX(${this.scroll.speed * 2 * item.dataset.speed}px)`;
+      // item.style.transform += `translateX(${this.scroll.speed * 2 * item.dataset.speed}px)`;
       // item.style.transform = `translateX(${-this.scroll.last * item.dataset.speed}px)`;
       item.style.transform += `skew(${this.transform.skewX}deg, 0)`;
       item.style.transform += `scaleY(${this.transform.scaleY})`;
