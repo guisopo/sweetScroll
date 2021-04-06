@@ -2,6 +2,8 @@
 
 SweetScroll is a Javascript module to create an horizontal smooth scroll page with optianl CSS transform effects. It uses the __Intersction Observer API__ to animate just the items that are visible in the viewport.
 
+![alt text](https://raw.githubusercontent.com/guisopo/sweetScroll/main/src/images/screenshot.png "Slider screenshot")
+
 ### Methods
 
 #### `smooth.init()`
